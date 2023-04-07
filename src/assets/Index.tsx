@@ -1,5 +1,1 @@
-import SvgReact from './react.svg'
-
-export {
-  SvgReact
-}
+export {default as SvgLogo} from './Logo.svg';

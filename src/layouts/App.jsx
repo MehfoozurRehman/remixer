@@ -1,6 +1,4 @@
-import Footer from "@components/Footer";
 import Head from "@router/Head";
-import Header from "@components/Header";
 import Outlet from "@router/Outlet";
 
 export default function App() {
@@ -12,9 +10,7 @@ export default function App() {
         url="https://vitefilerouter.com"
         description="Remixer"
       />
-      <Header />
       <Outlet />
-      <Footer />
     </>
   );
 }

@@ -1,5 +1,6 @@
 import imagePromiseFactory from "./imagePromiseFactory";
 import { useState } from "react";
+import { promiseFind } from "./promiseFind";
 
 export type useImageProps = {
   srcList: string | string[];
@@ -7,31 +8,9 @@ export type useImageProps = {
   useSuspense?: boolean;
 };
 
-const removeBlankArrayElements = (a) => a.filter((x) => x);
-const stringToArray = (x) => (Array.isArray(x) ? x : [x]);
+const removeBlankArrayElements = (a: any[]) => a.filter((x: any) => x);
+const stringToArray = (x: string | string[]) => (Array.isArray(x) ? x : [x]);
 const cache = {};
-
-// sequential map.find for promises
-const promiseFind = (arr, promiseFactory) => {
-  let done = false;
-  return new Promise((resolve, reject) => {
-    const queueNext = (src) => {
-      return promiseFactory(src).then(() => {
-        done = true;
-        resolve(src);
-      });
-    };
-
-    arr
-      .reduce((p, src) => {
-        // ensure we aren't done before enqueuing the next source
-        return p.catch(() => {
-          if (!done) return queueNext(src);
-        });
-      }, queueNext(arr.shift()))
-      .catch(reject);
-  });
-};
 
 export default function useImage({
   srcList,
@@ -64,14 +43,14 @@ export default function useImage({
   cache[sourceKey].promise
     // if a source was found, update cache
     // when not using suspense, update state to force a rerender
-    .then((src) => {
+    .then((src: any) => {
       cache[sourceKey] = { ...cache[sourceKey], cache: "resolved", src };
       if (!useSuspense) setIsSettled(sourceKey);
     })
 
     // if no source was found, or if another error occurred, update cache
     // when not using suspense, update state to force a rerender
-    .catch((error) => {
+    .catch((error: any) => {
       cache[sourceKey] = { ...cache[sourceKey], cache: "rejected", error };
       if (!useSuspense) setIsSettled(sourceKey);
     });

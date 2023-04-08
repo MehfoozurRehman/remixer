@@ -37,7 +37,7 @@ export default function RoutesReducer(
       .filter((p) => !p.includes("_"))
       .filter(Boolean);
 
-    segments.reduce((parent, segment, index) => {
+    const insertRoute = (parent, segment, index) => {
       const path = segment.replace(/index|\./g, "");
       const root = index === 0;
       const leaf = index === segments.length - 1 && segments.length > 1;
@@ -61,24 +61,20 @@ export default function RoutesReducer(
         );
         found
           ? (found.children ??= [])
-          : current?.[insert]({
-              path: path,
-              children: [],
-            });
+          : current?.[insert]({ path: path, children: [] });
         return (
           found || current?.[insert === "unshift" ? 0 : current.length - 1]
         );
       }
 
       if (leaf) {
-        parent?.children?.[insert]({
-          path: path.replace(/\/$/, ""),
-          ...route,
-        });
+        parent?.children?.[insert]({ path: path.replace(/\/$/, ""), ...route });
       }
 
       return parent;
-    }, {});
+    };
+
+    segments.reduce(insertRoute, {});
 
     return routes;
   }, []);

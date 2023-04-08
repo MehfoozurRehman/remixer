@@ -3,7 +3,6 @@ import { chunkSplitPlugin } from "vite-plugin-chunk-split";
 import { defineConfig } from "vite";
 import preload from "vite-plugin-preload";
 import react from "@vitejs/plugin-react";
-import { terser } from "rollup-plugin-terser";
 import viteCompression from "vite-plugin-compression";
 import viteImagemin from "vite-plugin-imagemin";
 
@@ -81,12 +80,4 @@ export default defineConfig({
     }),
     react(),
   ],
-  build: {
-    // Minify output with terser
-    cssCodeSplit: true,
-    minify: true,
-    rollupOptions: {
-      plugins: [terser()],
-    },
-  },
 });

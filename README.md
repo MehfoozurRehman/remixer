@@ -12,6 +12,8 @@ Remixer has a bunch of features and i dont want to ship all the code as base for
 
 - [Suspense After Initial Render](https://www.npmjs.com/package/suspense-after-initial-render) - This package is used to delay the suspense of a component until after the initial render. This is useful for components that are not critical to the initial render of the page.
 
+- [Suspense Image](https://www.npmjs.com/package/suspense-image) - This package is used to add suspense to an image. This is so that you can show a placeholder while the image is loading.
+
 ## Table of Contents
 
 -[Usage](#usage)

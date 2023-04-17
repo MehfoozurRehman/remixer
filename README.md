@@ -1,4 +1,4 @@
-# remixer
+# Remixer
 
 ## Description
 

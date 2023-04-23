@@ -19,7 +19,11 @@ export default defineConfig({
       },
       {
         find: "@router",
-        replacement: "/src/router",
+        replacement: "/router",
+      },
+      {
+        find: "@modules",
+        replacement: "/modules",
       },
     ],
   },
@@ -76,4 +80,9 @@ export default defineConfig({
     }),
     react(),
   ],
+  build: {
+    target: "es2018",
+    cssCodeSplit: true,
+    assetsInlineLimit: 4096,
+  },
 });

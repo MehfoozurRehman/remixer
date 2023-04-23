@@ -1,5 +1,5 @@
 import Head from "@router/Head";
-import Outlet from "@router/Outlet";
+import { Outlet } from "react-router-dom";
 
 export default function App() {
   return (

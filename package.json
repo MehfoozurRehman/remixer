@@ -13,8 +13,7 @@
     "build:ssg": "vite build && react-snap"
   },
   "reactSnap": {
-    "source": "dist",
-    "minifyHtml": {}
+    "source": "dist"
   },
   "dependencies": {
     "react": "^18.2.0",

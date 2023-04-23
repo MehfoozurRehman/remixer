@@ -2,6 +2,8 @@
   "javascript.preferences.importModuleSpecifier": "project-relative",
   "files.exclude": {
     "**/modules": true,
-    "**/router": true
+    "**/router": true,
+    "**/vite.d.ts": true,
+    "**/main.tsx": true
   }
 }

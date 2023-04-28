@@ -8,10 +8,6 @@ Welcome to our starter for React apps! Our goal is to provide you with the tools
 
 Remixer has a bunch of features and i dont want to ship all the code as base for every user so i am slowly making those features npm packages so that you can use them in your project. I will update this readme as i make more packages.
 
-## Packages
-
-- [Suspense After Initial Render](https://www.npmjs.com/package/suspense-after-initial-render) - This package is used to delay the suspense of a component until after the initial render. This is useful for components that are not critical to the initial render of the page.
-
 ## Table of Contents
 
 -[Usage](#usage)

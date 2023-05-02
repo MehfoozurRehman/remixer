@@ -1,14 +1,4 @@
-export function RoutePositionGenerator(
-  segments: string[],
-  routes: never[],
-  route: {
-    Component: any;
-    loader: any;
-    action: any;
-    ErrorBoundary: any;
-    preload: any;
-  }
-) {
+export function RoutePositionGenerator(segments, routes, route) {
   const insertRoute = (parent, segment, index) => {
     const path = segment.replace(/index|\./g, "");
     const root = index === 0;
@@ -28,9 +18,7 @@ export function RoutePositionGenerator(
 
     if (root || node) {
       const current = root ? routes : parent.children;
-      const found = current?.find(
-        (route: { path: string }) => route.path === path
-      );
+      const found = current?.find((route) => route.path === path);
       found
         ? (found.children ??= [])
         : current?.[insert]({ path: path, children: [] });

@@ -3,7 +3,7 @@ import ErrorBoundaryLoad from "./ErrorBoundary";
 import Loader from "./Loader";
 import { lazy } from "react";
 
-export function RouteGenerator(lazys: any, key: string, eagers: any) {
+export function RouteGenerator(lazys, key, eagers) {
   const module = eagers === null ? lazys[key] : eagers[key];
   const Component = eagers === null ? lazy(module) : module.default;
   const preload = eagers === null ? module : null;

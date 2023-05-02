@@ -1,4 +1,4 @@
-export function SegmentsGenerator(key: string) {
+export function SegmentsGenerator(key) {
   return key
     .replace(/\/src\/screens|\.jsx|\.tsx$/g, "")
     .replace(/\[\.{3}.+\]/, "*")

@@ -1,6 +1,9 @@
-import { Fragment } from 'react';
+import { Fragment } from "react";
 
-const PRESERVED = import.meta.glob('/src/layouts/(App|NotFound|Loading).(jsx|tsx)', { eager: true });
+const PRESERVED = import.meta.glob(
+  "/src/layouts/(App|NotFound|Loading).(jsx|tsx)",
+  { eager: true }
+);
 
 const preserved = Object.keys(PRESERVED).reduce(
   (acc, file) => ({
@@ -11,8 +14,8 @@ const preserved = Object.keys(PRESERVED).reduce(
   {}
 );
 
-const hasNotFoundError = !Object.keys(preserved).includes("NotFound")
-const hasLoadingError = !Object.keys(preserved).includes("Loading")
+const hasNotFoundError = !Object.keys(preserved).includes("NotFound");
+const hasLoadingError = !Object.keys(preserved).includes("Loading");
 
 if (hasNotFoundError || hasLoadingError) {
   const message =

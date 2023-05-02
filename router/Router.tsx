@@ -9,19 +9,19 @@ import.meta.glob("/src/styles/*.(scss|css)", { eager: true });
 
 if (!lazyRoutes.length && !eagerRoutes.length) console.error("No routes found");
 
+const router = createBrowserRouter([
+  {
+    path: "/",
+    Component: App,
+    children: [...eagerRoutes, ...lazyRoutes],
+  },
+  { path: "*", Component: NotFound },
+]);
+
 export default function Router() {
   return (
     <Suspense fallback={<Loading />}>
-      <RouterProvider
-        router={createBrowserRouter([
-          {
-            path: "/",
-            Component: App,
-            children: [...eagerRoutes, ...lazyRoutes],
-          },
-          { path: "*", Component: NotFound },
-        ])}
-      />
+      <RouterProvider router={router} />
     </Suspense>
   );
 }

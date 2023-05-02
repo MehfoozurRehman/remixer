@@ -1,7 +1,6 @@
 import { ViteWebfontDownload } from "vite-plugin-webfont-dl";
 import { chunkSplitPlugin } from "vite-plugin-chunk-split";
 import { defineConfig } from "vite";
-import preload from "vite-plugin-preload";
 import react from "@vitejs/plugin-react";
 import viteCompression from "vite-plugin-compression";
 import viteImagemin from "vite-plugin-imagemin";
@@ -28,7 +27,6 @@ export default defineConfig({
     ],
   },
   plugins: [
-    preload(),
     chunkSplitPlugin(),
     ViteWebfontDownload(),
     viteCompression({
@@ -80,9 +78,4 @@ export default defineConfig({
     }),
     react(),
   ],
-  build: {
-    target: "es2018",
-    cssCodeSplit: true,
-    assetsInlineLimit: 4096,
-  },
 });

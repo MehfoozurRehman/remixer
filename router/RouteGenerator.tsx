@@ -5,20 +5,20 @@ import { lazy } from "react";
 
 export function RouteGenerator(lazys, key, eagers) {
   const module = eagers === null ? lazys[key] : eagers[key];
-  const Component = eagers === null ? lazy(module) : module.default;
-  const preload = eagers === null ? module : null;
+  const Component = eagers ? module.default : lazy(module);
+  const preload = eagers ? null : module;
 
-  const loader = eagers === null ? Loader(module) : null;
-  const action = eagers === null ? Action(module) : null;
-  const ErrorBoundary = eagers === null ? ErrorBoundaryLoad(module) : null;
+  const loader = eagers ? eagers?.[key]?.loader : Loader(module);
+  const action = eagers ? eagers?.[key]?.action : Action(module);
+  const ErrorBoundary = eagers
+    ? eagers?.[key]?.Error
+    : ErrorBoundaryLoad(module);
 
-  const route = {
+  return {
     Component,
     loader,
     action,
     ErrorBoundary,
     preload,
   };
-
-  return route;
 }

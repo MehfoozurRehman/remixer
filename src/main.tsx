@@ -1,11 +1,6 @@
-import { createRoot, hydrateRoot } from "react-dom/client";
-
 import Router from "@router/Router";
+import { createRoot } from "react-dom/client";
 
 const rootElement = document.getElementById("root");
 
-if (rootElement.hasChildNodes()) {
-  hydrateRoot(<Router />, rootElement);
-} else {
-  createRoot(rootElement).render(<Router />);
-}
+createRoot(rootElement).render(<Router />);

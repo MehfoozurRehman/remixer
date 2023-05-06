@@ -1,4 +1,4 @@
-import LazyRoutes from "@router/LazyRoutes";
+import LazyRoutes from "./LazyRoutes";
 
 const regexCache = {};
 

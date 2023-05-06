@@ -1,7 +1,7 @@
 import { App, Loading, NotFound } from "./Preserved";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { Suspense, memo } from "react";
 
-import { Suspense } from "react";
 import eagerRoutes from "./EagerRoutes";
 import lazyRoutes from "./LazyRoutes";
 
@@ -18,10 +18,12 @@ const router = createBrowserRouter([
   { path: "*", Component: NotFound },
 ]);
 
-export default function Router() {
+const Router = memo(() => {
   return (
     <Suspense fallback={<Loading />}>
       <RouterProvider router={router} />
     </Suspense>
   );
-}
+});
+
+export default Router;

@@ -1,4 +1,7 @@
-export default function createPromiseImage({ decode = true, crossOrigin = "" }) {
+export default function createPromiseImage({
+  decode = true,
+  crossOrigin = "",
+}) {
   return function (src: string) {
     const img = new Image();
 
@@ -18,5 +21,5 @@ export default function createPromiseImage({ decode = true, crossOrigin = "" }) 
       img.onerror = reject;
       img.src = src;
     });
-  }
+  };
 }

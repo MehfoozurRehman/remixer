@@ -1,6 +1,7 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+
 import { Link as RouterLink } from "react-router-dom";
-import { getMatchingRoute } from "./GetMatchingRoute";
+import { getMatchingRoute } from "../router/GetMatchingRoute";
 
 interface LinkProps
   extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, "href"> {

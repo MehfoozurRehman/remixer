@@ -1,3 +1,4 @@
+import { memo } from "react";
 import useImage from "./useImage";
 
 interface ImgProps
@@ -6,7 +7,9 @@ interface ImgProps
   suspense?: boolean;
 }
 
-export default function Img({ src, suspense = false, ...props }: ImgProps) {
+const Img = memo(({ src, suspense = false, ...props }: ImgProps) => {
   const { src: source } = useImage({ srcList: [src], useSuspense: suspense });
   return <img src={source} {...props} />;
-}
+});
+
+export default Img;

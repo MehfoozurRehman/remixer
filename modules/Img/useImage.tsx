@@ -1,6 +1,6 @@
 import imagePromiseFactory from "./imagePromiseFactory";
-import { useState } from "react";
 import { promiseFind } from "./promiseFind";
+import { useState } from "react";
 
 export type useImageProps = {
   srcList: string | string[];

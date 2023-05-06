@@ -1,14 +1,11 @@
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, memo, useEffect, useState } from "react";
 
 interface Props {
   fallback: React.ReactNode;
   children: React.ReactNode;
 }
 
-export default function SuspenseAfterInitialRender({
-  fallback,
-  children,
-}: Props) {
+const SuspenseAfterInitialRender = memo(({ fallback, children }: Props) => {
   const [isInitialRender, setIsInitialRender] = useState(true);
 
   useEffect(() => {
@@ -18,4 +15,6 @@ export default function SuspenseAfterInitialRender({
   if (isInitialRender) return <>{children}</>;
 
   return <Suspense fallback={fallback}>{children}</Suspense>;
-}
+});
+
+export default SuspenseAfterInitialRender;

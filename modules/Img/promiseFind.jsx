@@ -1,11 +1,8 @@
 // sequential map.find for promises
-export const promiseFind = (
-  arr: any[],
-  promiseFactory: { (...args: any[]): Promise<void>; (arg0: any): Promise<any> }
-) => {
+export const promiseFind = (arr, promiseFactory) => {
   let done = false;
   return new Promise((resolve, reject) => {
-    const queueNext = (src: unknown) => {
+    const queueNext = (src) => {
       return promiseFactory(src).then(() => {
         done = true;
         resolve(src);
@@ -13,7 +10,7 @@ export const promiseFind = (
     };
 
     arr
-      .reduce((p: Promise<any>, src: any) => {
+      .reduce((p, src) => {
         // ensure we aren't done before enqueuing the next source
         return p.catch(() => {
           if (!done) return queueNext(src);

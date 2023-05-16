@@ -2,21 +2,15 @@ import imagePromiseFactory from "./imagePromiseFactory";
 import { promiseFind } from "./promiseFind";
 import { useState } from "react";
 
-export type useImageProps = {
-  srcList: string | string[];
-  imgPromise?: (...args: any[]) => Promise<void>;
-  useSuspense?: boolean;
-};
-
-const removeBlankArrayElements = (a: any[]) => a.filter((x: any) => x);
-const stringToArray = (x: string | string[]) => (Array.isArray(x) ? x : [x]);
+const removeBlankArrayElements = (a) => a.filter((x) => x);
+const stringToArray = (x) => (Array.isArray(x) ? x : [x]);
 const cache = {};
 
 export default function useImage({
   srcList,
   imgPromise = imagePromiseFactory({ decode: true }),
   useSuspense = true,
-}: useImageProps): { src: string | undefined; isLoading: boolean; error: any } {
+}) {
   const [, setIsSettled] = useState(false);
   const sourceList = removeBlankArrayElements(stringToArray(srcList));
   const sourceKey = sourceList.join("");
@@ -43,14 +37,14 @@ export default function useImage({
   cache[sourceKey].promise
     // if a source was found, update cache
     // when not using suspense, update state to force a rerender
-    .then((src: any) => {
+    .then((src) => {
       cache[sourceKey] = { ...cache[sourceKey], cache: "resolved", src };
       if (!useSuspense) setIsSettled(sourceKey);
     })
 
     // if no source was found, or if another error occurred, update cache
     // when not using suspense, update state to force a rerender
-    .catch((error: any) => {
+    .catch((error) => {
       cache[sourceKey] = { ...cache[sourceKey], cache: "rejected", error };
       if (!useSuspense) setIsSettled(sourceKey);
     });

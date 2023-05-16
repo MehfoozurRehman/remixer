@@ -1,11 +1,6 @@
 import React, { Suspense, memo, useEffect, useState } from "react";
 
-interface Props {
-  fallback: React.ReactNode;
-  children: React.ReactNode;
-}
-
-const SuspenseAfterInitialRender = memo(({ fallback, children }: Props) => {
+const SuspenseAfterInitialRender = memo(({ fallback, children }) => {
   const [isInitialRender, setIsInitialRender] = useState(true);
 
   useEffect(() => {

@@ -10,14 +10,8 @@ import React, {
 import { Link as RouterLink } from "react-router-dom";
 import { getMatchingRoute } from "../router/GetMatchingRoute";
 
-interface LinkProps
-  extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, "href"> {
-  to: string;
-  prefetch?: boolean;
-}
-
-const Link = memo(({ to, prefetch = true, ...props }: LinkProps) => {
-  const ref = useRef<HTMLAnchorElement>(null);
+const Link = memo(({ to, prefetch = true, ...props }) => {
+  const ref = useRef(null);
   const [prefetched, setPrefetched] = useState(false);
 
   const route = useMemo(() => getMatchingRoute(to), [to]);

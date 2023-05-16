@@ -10,14 +10,8 @@ import React, {
 import { NavLink as RouterLink } from "react-router-dom";
 import { getMatchingRoute } from "../router/GetMatchingRoute";
 
-interface NavLinkProps
-  extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, "href"> {
-  to: string;
-  prefetch?: boolean;
-}
-
-const NavLink = memo(({ to, prefetch = true, ...props }: NavLinkProps) => {
-  const ref = useRef<HTMLAnchorElement>(null);
+const NavLink = memo(({ to, prefetch = true, ...props }) => {
+  const ref = useRef(null);
   const [prefetched, setPrefetched] = useState(false);
 
   const route = useMemo(() => getMatchingRoute(to), [to]);

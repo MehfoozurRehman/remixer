@@ -1,4 +1,4 @@
-import { Suspense, memo, useEffect, useState } from "react";
+import React, { Suspense, memo, useEffect, useState } from "react";
 
 interface Props {
   fallback: React.ReactNode;

@@ -1,18 +1,10 @@
-import { ReactElement, memo } from "react";
+import React, { memo } from "react";
 
-import MetaTags from "react-helmet";
+import Helmet from "react-helmet";
 
-interface HeadProps {
-  title: string;
-  description: string;
-  url: string;
-  image: string;
-  children?: ReactElement<"meta" | "link"> | ReactElement<"meta" | "link">[];
-}
-
-const Head = memo(({ title, description, url, image, children }: HeadProps) => {
+const Head = memo(({ title, description, url, image, children }) => {
   return (
-    <MetaTags>
+    <Helmet>
       <title>{title}</title>
       <link rel="icon" href={image} />
       <link rel="apple-touch-icon" href={image} />
@@ -32,7 +24,7 @@ const Head = memo(({ title, description, url, image, children }: HeadProps) => {
       <meta name="twitter:description" content={description} />
       <meta name="theme-color" content="#000000" />
       {children}
-    </MetaTags>
+    </Helmet>
   );
 });
 

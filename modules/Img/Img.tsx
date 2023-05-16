@@ -1,4 +1,5 @@
-import { memo } from "react";
+import React, { memo } from "react";
+
 import useImage from "./useImage";
 
 interface ImgProps

@@ -1,13 +1,12 @@
 import { Fragment } from "react";
 
-const PRESERVED = import.meta.glob(
-  "/src/layouts/(App|NotFound|Loading).(jsx|tsx)",
-  { eager: true }
-);
+const PRESERVED = import.meta.glob("/src/layouts/(App|NotFound|Loading).jsx", {
+  eager: true,
+});
 const preserved = {};
 
 for (const file of Object.keys(PRESERVED)) {
-  const key = file.replace(/\/src\/layouts\/|\.jsx|\.tsx$/g, "");
+  const key = file.replace(/\/src\/layouts\/|\.jsx$/g, "");
   preserved[key] = PRESERVED[file].default;
 }
 

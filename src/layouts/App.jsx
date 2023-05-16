@@ -1,4 +1,4 @@
-import { Head } from "@modules";
+import Head from "@modules/Head";
 import { Outlet } from "react-router-dom";
 
 export default function App() {

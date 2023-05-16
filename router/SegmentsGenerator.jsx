@@ -1,6 +1,6 @@
 export function SegmentsGenerator(key) {
   return key
-    .replace(/\/src\/screens|\.jsx|\.tsx|\[\.{3}.+\]|\.lazy/g, "")
+    .replace(/\/src\/screens|\.jsx|\[\.{3}.+\]|\.lazy/g, "")
     .replace(/\[(.+)\]/g, ":$1")
     .toLowerCase()
     .split("/")

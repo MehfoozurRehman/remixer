@@ -1,6 +1,6 @@
 import { ReactElement, memo } from "react";
 
-import MetaTags from "react-meta-tags";
+import MetaTags from "react-helmet";
 
 interface HeadProps {
   title: string;

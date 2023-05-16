@@ -11,16 +11,12 @@
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-meta-tags": "^1.0.1",
+    "react-helmet": "^6.1.0",
     "react-router-dom": "6.11.1"
   },
   "devDependencies": {
-    "@types/node": "^20.1.1",
-    "@types/react": "^18.2.6",
-    "@types/react-dom": "^18.2.4",
     "@vitejs/plugin-react": "^4.0.0",
     "sass": "^1.62.1",
-    "typescript": "^5.0.4",
     "vite": "^4.3.5",
     "vite-plugin-chunk-split": "^0.4.7",
     "vite-plugin-compression": "^0.5.1",

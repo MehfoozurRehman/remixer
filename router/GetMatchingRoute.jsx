@@ -2,7 +2,7 @@ import LazyRoutes from "./LazyRoutes";
 
 const regexCache = {};
 
-export const getMatchingRoute = (path: string) => {
+export const getMatchingRoute = (path) => {
   for (const route of LazyRoutes) {
     let regex = regexCache[route.path];
     if (!regex) {

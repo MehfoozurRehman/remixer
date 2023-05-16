@@ -17,7 +17,7 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^4.0.0",
     "sass": "^1.62.1",
-    "vite": "^4.3.5",
+    "vite": "^4.3.6",
     "vite-plugin-chunk-split": "^0.4.7",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-imagemin": "^0.6.1",

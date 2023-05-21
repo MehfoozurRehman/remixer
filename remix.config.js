@@ -1,6 +1,8 @@
 export const config = {
-  imagesOptimization: true,
+  compression: true,
   fontOptimization: true,
+  progressiveWebApp: false,
+  imagesOptimization: false,
   alias: [
     // {
     //   find: "@somefolder",

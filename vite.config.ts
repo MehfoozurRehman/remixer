@@ -1,3 +1,4 @@
+import { VitePWA } from "vite-plugin-pwa";
 import { ViteWebfontDownload } from "vite-plugin-webfont-dl";
 import { chunkSplitPlugin } from "vite-plugin-chunk-split";
 import { config } from "./remix.config";
@@ -29,12 +30,14 @@ export default defineConfig({
     ],
   },
   plugins: [
-    chunkSplitPlugin(),
+    config.compression && chunkSplitPlugin(),
     config.fontOptimization && ViteWebfontDownload(),
-    viteCompression({
-      algorithm: "brotliCompress",
-      threshold: 100,
-    }),
+    config.compression &&
+      viteCompression({
+        algorithm: "brotliCompress",
+        threshold: 100,
+      }),
+    config.progressiveWebApp && VitePWA({ registerType: "autoUpdate" }),
     config.imagesOptimization &&
       viteImagemin({
         gifsicle: {

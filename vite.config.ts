@@ -22,10 +22,6 @@ export default defineConfig({
         find: "@router",
         replacement: "/router",
       },
-      {
-        find: "@modules",
-        replacement: "/modules",
-      },
       ...config.alias,
     ],
   },

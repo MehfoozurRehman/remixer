@@ -18,12 +18,10 @@ const router = createBrowserRouter([
   { path: "*", Component: NotFound },
 ]);
 
-const Router = memo(() => {
-  return (
-    <Suspense fallback={<Loading />}>
-      <RouterProvider router={router} />
-    </Suspense>
-  );
-});
+const Router = () => (
+  <Suspense fallback={<Loading />}>
+    <RouterProvider router={router} future={{ v7_startTransition: true }} />
+  </Suspense>
+);
 
 export default Router;

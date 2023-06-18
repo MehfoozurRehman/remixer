@@ -6,7 +6,7 @@ export default function App() {
     <>
       <Head
         title="Remixer"
-        image="/favicon.svg"
+        image="/favicon.ico"
         url="https://vitefilerouter.com"
         description="Remixer"
       />

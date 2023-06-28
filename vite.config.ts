@@ -13,6 +13,7 @@ export default defineConfig({
       "@components": "/src/components",
       "@assets": "/src/assets",
       "@router": "/router",
+      "@layouts": "/src/layouts",
       ...config.alias,
     },
   },

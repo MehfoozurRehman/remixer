@@ -1,3 +1,3 @@
-export default function Loading() {
+export default () => {
   return <div>loading</div>;
-}
+};

@@ -1,7 +1,7 @@
 import { Head } from "@router";
 import { Outlet } from "react-router-dom";
 
-export default function App() {
+export default () => {
   return (
     <>
       <Head
@@ -13,4 +13,4 @@ export default function App() {
       <Outlet />
     </>
   );
-}
+};

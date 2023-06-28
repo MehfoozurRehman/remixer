@@ -3,10 +3,7 @@ export const config = {
   fontOptimization: true,
   progressiveWebApp: false,
   imagesOptimization: false,
-  alias: [
-    // {
-    //   find: "@somefolder",
-    //   replacement: "/src/somefolder",
-    // },
-  ],
+  alias: {
+    // "@somealias": "/src/somepath",
+  },
 };

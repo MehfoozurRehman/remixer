@@ -34,6 +34,9 @@ devDependencies:
   vite-plugin-compression:
     specifier: ^0.5.1
     version: 0.5.1(vite@4.3.9)
+  vite-plugin-hot-export:
+    specifier: ^0.5.9
+    version: 0.5.9
   vite-plugin-imagemin:
     specifier: ^0.6.1
     version: 0.6.1(vite@4.3.9)
@@ -52,6 +55,10 @@ packages:
     dependencies:
       '@jridgewell/gen-mapping': 0.3.3
       '@jridgewell/trace-mapping': 0.3.18
+    dev: true
+
+  /@antfu/utils@0.7.4:
+    resolution: {integrity: sha512-qe8Nmh9rYI/HIspLSTwtbMFPj6dISG6+dJnOguTlPNXtCvS2uezdxscVBb7/3DrmNbQK49TDqpkSQ1chbRGdpQ==}
     dev: true
 
   /@apideck/better-ajv-errors@0.3.6(ajv@8.12.0):
@@ -1832,6 +1839,17 @@ packages:
     engines: {node: '>= 4.0.0'}
     dev: true
 
+  /auto-export@0.3.7:
+    resolution: {integrity: sha512-VxraIqKKbMdJQiXJX6soBl1H6oj0Xp9jXOTeCYK0b7kYltyyvi0dcVZrJut7pN5e68wKrkQaehzO4l40XvEyBQ==}
+    hasBin: true
+    dependencies:
+      cac: 6.7.14
+      chalk: 4.1.2
+      commander: 9.5.0
+      pathe: 0.3.9
+      unconfig: 0.3.9
+    dev: true
+
   /available-typed-arrays@1.0.5:
     resolution: {integrity: sha512-DMD0KiN46eipeziST1LPP/STfDU0sufISXmjSgvVsoU2tqxctQeASejWcfNtxYKqETM1UxQ8sp2OrSBWpHY6sw==}
     engines: {node: '>= 0.4'}
@@ -2021,6 +2039,11 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
+  /cac@6.7.14:
+    resolution: {integrity: sha512-b6Ilus+c3RrdDk+JhLKUAQfzzgLEPy6wcXqS7f/xe1EETvsDP6GORG7SFuOs6cID5YkqchW/LXZbX5bc8j7ZcQ==}
+    engines: {node: '>=8'}
+    dev: true
+
   /cacheable-request@2.1.4:
     resolution: {integrity: sha512-vag0O2LKZ/najSoUwDbVlnlCFvhBE/7mGTY2B5FgCBDcRD+oVV1HYTOwM6JZfMg/hIcM6IwnTZ1uQQL5/X3xIQ==}
     dependencies:
@@ -2158,6 +2181,11 @@ packages:
   /commander@7.2.0:
     resolution: {integrity: sha512-QrWXB+ZQSVPmIWIhtEO9H+gwHaMGYiF5ChvoJ+K9ZGHG/sVsa6yiesAD1GC/x46sET00Xlwo1u49RVVVzvcSkw==}
     engines: {node: '>= 10'}
+    dev: true
+
+  /commander@9.5.0:
+    resolution: {integrity: sha512-KRs7WVDKg86PWiuAqhDrAQnTXZKraVcCc6vFdL14qrZ/DcWwuRo7VoiYXalXO7S5GKpqYiVEwCbgFDfxNHKJBQ==}
+    engines: {node: ^12.20.0 || >=14}
     dev: true
 
   /common-tags@1.8.2:
@@ -2374,6 +2402,10 @@ packages:
     dependencies:
       has-property-descriptors: 1.0.0
       object-keys: 1.1.1
+    dev: true
+
+  /defu@6.1.2:
+    resolution: {integrity: sha512-+uO4+qr7msjNNWKYPHqN/3+Dx3NFkmIzayk2L1MyZQlvgZb/J1A0fo410dpKrN2SnqFjt8n4JL8fDJE0wIgjFQ==}
     dev: true
 
   /delayed-stream@1.0.0:
@@ -3753,6 +3785,11 @@ packages:
       supports-color: 7.2.0
     dev: true
 
+  /jiti@1.18.2:
+    resolution: {integrity: sha512-QAdOptna2NYiSSpv0O/BwoHBSmz4YhpzJHyi+fnMRTXFjp7B8i/YG5Z8IfusxB1ufjcD2Sre1F3R+nX3fvy7gg==}
+    hasBin: true
+    dev: true
+
   /jpegtran-bin@5.0.2:
     resolution: {integrity: sha512-4FSmgIcr8d5+V6T1+dHbPZjaFH0ogVyP4UVsE+zri7S9YLO4qAT2our4IN3sW3STVgNTbqPermdIgt2XuAJ4EA==}
     engines: {node: '>=10'}
@@ -4281,6 +4318,10 @@ packages:
 
   /pathe@0.2.0:
     resolution: {integrity: sha512-sTitTPYnn23esFR3RlqYBWn4c45WGeLcsKzQiUpXJAyfcWkolvlYpV8FLo7JishK946oQwMFUCHXQ9AjGPKExw==}
+    dev: true
+
+  /pathe@0.3.9:
+    resolution: {integrity: sha512-6Y6s0vT112P3jD8dGfuS6r+lpa0qqNrLyHPOwvXMnyNTQaYiwgau2DP3aNDsR13xqtGj7rrPo+jFUATpU6/s+g==}
     dev: true
 
   /pend@1.2.0:
@@ -5149,6 +5190,14 @@ packages:
       through: 2.3.8
     dev: true
 
+  /unconfig@0.3.9:
+    resolution: {integrity: sha512-8yhetFd48M641mxrkWA+C/lZU4N0rCOdlo3dFsyFPnBHBjMJfjT/3eAZBRT2RxCRqeBMAKBVgikejdS6yeBjMw==}
+    dependencies:
+      '@antfu/utils': 0.7.4
+      defu: 6.1.2
+      jiti: 1.18.2
+    dev: true
+
   /unicode-canonical-property-names-ecmascript@2.0.0:
     resolution: {integrity: sha512-yY5PpDlfVIU5+y/BSCxAJRBIS1Zc2dDG3Ujq+sR0U+JjUevW2JhocOF+soROYDSaAezOzOKuyyixhD6mBknSmQ==}
     engines: {node: '>=4'}
@@ -5263,6 +5312,14 @@ packages:
       vite: 4.3.9(sass@1.63.6)
     transitivePeerDependencies:
       - supports-color
+    dev: true
+
+  /vite-plugin-hot-export@0.5.9:
+    resolution: {integrity: sha512-kV8IllmA4VGEKy0SclAbNOm11ic+czz2tTqKhRWqgkU8Se8kB8VpHZd6sLa6TqESLJi15IlPWt/zsmYbpZV74Q==}
+    dependencies:
+      auto-export: 0.3.7
+      chokidar: 3.5.3
+      unconfig: 0.3.9
     dev: true
 
   /vite-plugin-imagemin@0.6.1(vite@4.3.9):

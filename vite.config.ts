@@ -1,3 +1,4 @@
+import HotExport from "vite-plugin-hot-export";
 import { VitePWA } from "vite-plugin-pwa";
 import { ViteWebfontDownload } from "vite-plugin-webfont-dl";
 import { chunkSplitPlugin } from "vite-plugin-chunk-split";
@@ -17,7 +18,9 @@ export default defineConfig({
       ...config.alias,
     },
   },
+
   plugins: [
+    HotExport(),
     config.compression && chunkSplitPlugin(),
     config.fontOptimization && ViteWebfontDownload(),
     config.compression &&

@@ -1,9 +1,17 @@
-import { Fragment, Suspense, lazy } from "react";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { Suspense, lazy } from "react";
 
-const PRESERVED = import.meta.glob("/src/layouts/(App|NotFound|Loading).jsx", {
-  eager: true,
-});
+import App from "@layouts/App";
+import Loading from "@layouts/Loading";
+import NotFound from "@layouts/NotFound";
+
+if (!Loading) {
+  console.error("No loader file found in layouts folder");
+}
+
+if (!NotFound) {
+  console.error("No Not found file found in layouts folder");
+}
 
 const regexCache = new Map();
 
@@ -22,27 +30,6 @@ export const getMatchingRoute = (path) => {
   }
   return null;
 };
-
-const preserved = {};
-
-for (const file of Object.keys(PRESERVED)) {
-  const key = file.replace(/\/src\/layouts\/|\.jsx$/g, "");
-  preserved[key] = PRESERVED[file].default;
-}
-
-const hasNotFoundError = !("NotFound" in preserved);
-const hasLoadingError = !("Loading" in preserved);
-
-if (hasLoadingError) {
-  console.error("No loader file found in layouts folder");
-}
-if (hasNotFoundError) {
-  console.error("No Not found file found in layouts folder");
-}
-
-const App = preserved["App"] || Fragment;
-const NotFound = preserved["NotFound"] || Fragment;
-const Loading = preserved["Loading"] || Fragment;
 
 const Action = async (routes, ...args) => {
   const { action } = await routes();

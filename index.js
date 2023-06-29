@@ -114,15 +114,25 @@ const createProject = async () => {
       'install-deps': installDeps,
       'init-git': initGit,
     } = answers;
+
+    let finalProjectName = projectName;
+    if (projectName === '.') {
+      const currentDirName = path.basename(CURR_DIR);
+      console.log(
+        chalk.yellow(`Using current directory name '${currentDirName}' as the project name.`)
+      );
+      finalProjectName = currentDirName;
+    }
+
     const templatePath = path.join(__dirname, 'templates', projectChoice);
-    const projectPath = path.join(CURR_DIR, projectName);
+    const projectPath = path.join(CURR_DIR, finalProjectName);
 
     if (fs.existsSync(projectPath)) {
       const overwriteAnswer = await inquirer.prompt([
         {
           name: 'overwrite',
           type: 'confirm',
-          message: `A directory named '${projectName}' already exists. Do you want to overwrite it?`,
+          message: `A directory named '${finalProjectName}' already exists. Do you want to overwrite it?`,
           default: false,
         },
       ]);
@@ -131,15 +141,15 @@ const createProject = async () => {
         return;
       } else {
         fs.rmdirSync(projectPath, { recursive: true });
-        console.log(chalk.yellow(`Removed existing directory '${projectName}'.`));
+        console.log(chalk.yellow(`Removed existing directory '${finalProjectName}'.`));
       }
     }
 
     fs.mkdirSync(projectPath);
     console.log(chalk.green(`Created project directory at ${projectPath}`));
 
-    console.log(chalk.green(`Creating project '${projectName}' from template...`));
-    await generator(templatePath, projectName, projectName);
+    console.log(chalk.green(`Creating project '${finalProjectName}' from template...`));
+    await generator(templatePath, finalProjectName, finalProjectName);
     console.log(chalk.green('Project generation completed.'));
 
     if (installDeps) {
@@ -165,7 +175,7 @@ const createProject = async () => {
     }
 
     console.log(chalk.green.bold('\nProject setup completed.'));
-    console.log(chalk.green(`\nYour project '${projectName}' is ready at ${projectPath}`));
+    console.log(chalk.green(`\nYour project '${finalProjectName}' is ready at ${projectPath}`));
   } catch (error) {
     console.error(chalk.red('An error occurred:'), error);
   }

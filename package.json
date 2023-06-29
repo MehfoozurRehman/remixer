@@ -1,28 +1,35 @@
 {
   "name": "remixer",
-  "private": true,
   "version": "1.0.0",
+  "description": "Project for instantiating projects via cli",
+  "main": "index.js",
   "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+  "bin": {
+    "remixer": "./index.js"
   },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com//MehfoozurRehman/remixer.git"
+  },
+  "author": "Leonardo Roese",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com//MehfoozurRehman/remixer/issues"
+  },
+  "homepage": "https://github.com//MehfoozurRehman/remixer#readme",
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-helmet": "^6.1.0",
-    "react-router-dom": "6.14.0"
+    "inquirer": "^8.0.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.0.1",
-    "sass": "^1.63.6",
-    "vite": "^4.3.9",
-    "vite-plugin-chunk-split": "^0.4.7",
-    "vite-plugin-compression": "^0.5.1",
-    "vite-plugin-hot-export": "^0.5.9",
-    "vite-plugin-imagemin": "^0.6.1",
-    "vite-plugin-pwa": "^0.16.4",
-    "vite-plugin-webfont-dl": "^3.7.6"
+    "@babel/core": "^7.13.10",
+    "eslint": "^7.22.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-prettier": "^3.3.1",
+    "prettier": "^2.2.1"
   }
 }

@@ -1,0 +1,14 @@
+{
+  "files.exclude": {
+    "**/router": true,
+    "**/main.tsx": true,
+    "**/index.ts": true,
+    "**/tsconfig.json": true,
+    "**/electron.vite.config.ts": true,
+    "**/.prettierignore": true,
+    "**/export.config.ts": true,
+    "**/postcss.config.js": true,
+    "**/dev-app-update.yml": true,
+    "**/electron-builder.yml": true
+  }
+}

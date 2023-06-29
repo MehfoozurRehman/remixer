@@ -18,7 +18,7 @@ To use the Project Generator, run the following command:
 create-remixer
 ```
 
-# Or
+Or
 
 ```bash
 npx create-remixer

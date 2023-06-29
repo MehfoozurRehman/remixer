@@ -77,9 +77,9 @@ const QUESTIONS = [
     type: 'input',
     message: 'Project name:',
     validate: function (input) {
-      return /^([A-Za-z\-\\_\d])+$/.test(input)
+      return /^([A-Za-z\-\\_\d.])+$/.test(input)
         ? true
-        : 'Project name may only include letters, numbers, underscores, and hashes.';
+        : 'Project name may only include letters, numbers, underscores, hashes, and dots.';
     },
   },
   {

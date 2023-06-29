@@ -1,4 +1,4 @@
-# remixer-electron
+# project_name
 
 An Electron application with React and TypeScript
 

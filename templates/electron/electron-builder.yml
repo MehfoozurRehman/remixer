@@ -1,18 +1,18 @@
 appId: com.electron.app
-productName: remixer-electron
+productName: project_name
 directories:
   buildResources: build
 files:
-  - "!**/.vscode/*"
-  - "!src/*"
-  - "!electron.vite.config.{js,ts,mjs,cjs}"
-  - "!{dev-app-update.yml,CHANGELOG.md,README.md}"
-  - "!{tsconfig.json}"
+  - '!**/.vscode/*'
+  - '!src/*'
+  - '!electron.vite.config.{js,ts,mjs,cjs}'
+  - '!{dev-app-update.yml,CHANGELOG.md,README.md}'
+  - '!{tsconfig.json}'
 asarUnpack:
   - resources/*
 afterSign: build/notarize.js
 win:
-  executableName: remixer-electron
+  executableName: project_name
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}

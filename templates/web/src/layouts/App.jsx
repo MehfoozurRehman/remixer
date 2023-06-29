@@ -1,14 +1,14 @@
-import { Head } from "@router";
-import { Outlet } from "react-router-dom";
+import { Head } from '@router';
+import { Outlet } from 'react-router-dom';
 
 export default () => {
   return (
     <>
       <Head
-        title="Remixer"
+        title="project_name"
         image="/favicon.ico"
         url="https://vitefilerouter.com"
-        description="Remixer"
+        description="project_name"
       />
       <Outlet />
     </>

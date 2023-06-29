@@ -1,4 +1,4 @@
-# Remixer
+# project_name
 
 ## Description
 

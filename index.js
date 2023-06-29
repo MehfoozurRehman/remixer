@@ -59,7 +59,7 @@ const createProject = async () => {
 
     fs.mkdirSync(projectPath);
     console.log(`Creating project '${projectName}' from template '${projectChoice}'...`);
-    generator(templatePath, projectName);
+    generator(templatePath, projectName, projectName);
     console.log('Project generation completed.');
   } catch (error) {
     console.error('An error occurred:', error);

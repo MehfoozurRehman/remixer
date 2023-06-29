@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com//MehfoozurRehman/remixer#readme",
   "dependencies": {
+    "chalk": "^5.3.0",
     "inquirer": "^9.2.7",
     "js-yaml": "^4.1.0"
   },

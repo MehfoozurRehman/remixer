@@ -8,12 +8,6 @@ The Project Generator is a command-line tool that allows you to quickly generate
 npx create-remixer
 ```
 
-or
-
-```bash
-yarn create remixer
-```
-
 ## Contributing
 
 Contributions are welcome! For bug reports or requests please [submit an issue]

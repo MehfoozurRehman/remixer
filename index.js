@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 
+import chalk from 'chalk';
 import { dirname } from 'path';
 import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
@@ -57,7 +58,7 @@ const createProject = async () => {
         },
       ]);
       if (!overwriteAnswer['overwrite']) {
-        console.log('Aborted. Please choose a different project name.');
+        console.log(chalk.red('Aborted. Please choose a different project name.'));
         return;
       } else {
         fs.rmdirSync(projectPath, { recursive: true });
@@ -65,9 +66,11 @@ const createProject = async () => {
     }
 
     fs.mkdirSync(projectPath);
-    console.log(`Creating project '${projectName}' from template '${projectChoice}'...`);
+    console.log(
+      chalk.green(`Creating project '${projectName}' from template '${projectChoice}'...`)
+    );
     generator(templatePath, projectName, projectName);
-    console.log('Project generation completed.');
+    console.log(chalk.green('Project generation completed.'));
 
     const installDeps = answers['install-deps'];
     if (installDeps) {
@@ -80,21 +83,22 @@ const createProject = async () => {
         },
       ]);
       const packageManager = packageManagerAnswer['package-manager'];
-      console.log(`Installing dependencies with ${packageManager}...`);
+      console.log(chalk.yellow(`Installing dependencies with ${packageManager}...`));
       const installCommand =
         packageManager === 'yarn' ? 'yarn install' : 'npm install --legacy-peer-deps';
       execSync(installCommand, { cwd: projectPath, stdio: 'inherit' });
-      console.log('Dependencies installed successfully.');
+      console.log(chalk.yellow('Dependencies installed successfully.'));
     }
 
-    console.log('Project setup completed.');
+    console.log(chalk.green.bold('\nProject setup completed.'));
+    console.log(chalk.green(`\nYour project '${projectName}' is ready at ${projectPath}`));
   } catch (error) {
-    console.error('An error occurred:', error);
+    console.error(chalk.red('An error occurred:'), error);
   }
 };
 
 const handleCancellation = () => {
-  console.log('\nUser cancelled the prompt.');
+  console.log(chalk.yellow('\nUser cancelled the prompt.'));
   process.exit();
 };
 

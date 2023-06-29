@@ -118,9 +118,7 @@ const createProject = async () => {
     let finalProjectName = projectName;
     if (projectName === '.') {
       const currentDirName = path.basename(CURR_DIR);
-      console.log(
-        chalk.yellow(`Using current directory name '${currentDirName}' as the project name.`)
-      );
+      console.log(chalk.yellow(`Using current directory name '${currentDirName}' as the project name.`));
       finalProjectName = currentDirName;
     }
 
@@ -163,8 +161,7 @@ const createProject = async () => {
       ]);
       const packageManager = packageManagerAnswer['package-manager'];
       console.log(chalk.yellow(`Installing dependencies with ${packageManager}...`));
-      const installCommand =
-        packageManager === 'yarn' ? 'yarn install' : 'npm install --legacy-peer-deps';
+      const installCommand = packageManager === 'yarn' ? 'yarn install' : 'npm install --legacy-peer-deps';
       execSync(installCommand, { cwd: projectPath, stdio: 'inherit' });
       console.log(chalk.yellow('Dependencies installed successfully.'));
     }

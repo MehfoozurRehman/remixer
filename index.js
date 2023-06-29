@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import * as fs from 'fs';
 
 import { dirname } from 'path';
@@ -54,6 +52,8 @@ const createProject = async () => {
       if (!overwriteAnswer['overwrite']) {
         console.log('Aborted. Please choose a different project name.');
         return;
+      } else {
+        fs.rmdirSync(projectPath, { recursive: true });
       }
     }
 

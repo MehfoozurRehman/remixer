@@ -1,14 +1,73 @@
-import * as fs from 'fs';
-
 import chalk from 'chalk';
-import { dirname } from 'path';
 import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
-import generator from './generator.js';
+import fs from 'fs';
 import inquirer from 'inquirer';
+import path from 'path';
+import yaml from 'js-yaml';
 
 const CURR_DIR = process.cwd();
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const PROJECT_NAME_PLACEHOLDER = 'project_name';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const replaceProjectNamePlaceholder = (data, projectName) => {
+  if (typeof data === 'object') {
+    if (Array.isArray(data)) {
+      return data.map(item => replaceProjectNamePlaceholder(item, projectName));
+    } else {
+      const updatedData = {};
+      for (const key in data) {
+        updatedData[key] = replaceProjectNamePlaceholder(data[key], projectName);
+      }
+      return updatedData;
+    }
+  } else if (typeof data === 'string') {
+    return data.replace(new RegExp(PROJECT_NAME_PLACEHOLDER, 'g'), projectName);
+  } else {
+    return data;
+  }
+};
+
+const generator = async (templatePath, newProjectPath, projectName) => {
+  const filesToCreate = await fs.promises.readdir(templatePath);
+
+  for (const file of filesToCreate) {
+    const origFilePath = path.join(templatePath, file);
+    const stats = await fs.promises.stat(origFilePath);
+
+    if (stats.isFile()) {
+      const writePath = path.join(CURR_DIR, newProjectPath, file);
+      const fileExt = path.extname(file);
+
+      if (['.js', '.jsx', '.html', '.md', '.tsx', '.yml', '.yaml'].includes(fileExt)) {
+        let contents = await fs.promises.readFile(origFilePath, 'utf8');
+
+        if (['.yml', '.yaml'].includes(fileExt)) {
+          const yamlData = yaml.load(contents);
+          const updatedYamlData = replaceProjectNamePlaceholder(yamlData, projectName);
+          contents = yaml.dump(updatedYamlData);
+        } else {
+          contents = contents.replace(new RegExp(PROJECT_NAME_PLACEHOLDER, 'g'), projectName);
+        }
+
+        await fs.promises.writeFile(writePath, contents, 'utf8');
+      } else if (file === 'package.json') {
+        let contents = await fs.promises.readFile(origFilePath, 'utf8');
+        const packageJson = JSON.parse(contents);
+        packageJson.name = projectName;
+        await fs.promises.writeFile(writePath, JSON.stringify(packageJson, null, 2), 'utf8');
+      } else {
+        const readStream = fs.createReadStream(origFilePath);
+        const writeStream = fs.createWriteStream(writePath);
+        readStream.pipe(writeStream);
+      }
+    } else if (stats.isDirectory()) {
+      const newDirPath = path.join(CURR_DIR, newProjectPath, file);
+      await fs.promises.mkdir(newDirPath);
+      await generator(path.join(templatePath, file), path.join(newProjectPath, file), projectName);
+    }
+  }
+};
 
 const CHOICES = fs.readdirSync(`${__dirname}/templates`);
 
@@ -18,8 +77,9 @@ const QUESTIONS = [
     type: 'input',
     message: 'Project name:',
     validate: function (input) {
-      if (/^([A-Za-z\-\\_\d])+$/.test(input)) return true;
-      else return 'Project name may only include letters, numbers, underscores, and hashes.';
+      return /^([A-Za-z\-\\_\d])+$/.test(input)
+        ? true
+        : 'Project name may only include letters, numbers, underscores, and hashes.';
     },
   },
   {
@@ -28,8 +88,7 @@ const QUESTIONS = [
     message: 'What project template would you like to generate?',
     choices: CHOICES,
     validate: function (input) {
-      if (CHOICES.includes(input)) return true;
-      else return 'Please select a valid project template.';
+      return CHOICES.includes(input) ? true : 'Please select a valid project template.';
     },
   },
   {
@@ -49,10 +108,14 @@ const QUESTIONS = [
 const createProject = async () => {
   try {
     const answers = await inquirer.prompt(QUESTIONS);
-    const projectChoice = answers['project-choice'];
-    const projectName = answers['project-name'];
-    const templatePath = `${__dirname}/templates/${projectChoice}`;
-    const projectPath = `${CURR_DIR}/${projectName}`;
+    const {
+      'project-choice': projectChoice,
+      'project-name': projectName,
+      'install-deps': installDeps,
+      'init-git': initGit,
+    } = answers;
+    const templatePath = path.join(__dirname, 'templates', projectChoice);
+    const projectPath = path.join(CURR_DIR, projectName);
 
     if (fs.existsSync(projectPath)) {
       const overwriteAnswer = await inquirer.prompt([
@@ -63,22 +126,22 @@ const createProject = async () => {
           default: false,
         },
       ]);
-      if (!overwriteAnswer['overwrite']) {
+      if (!overwriteAnswer.overwrite) {
         console.log(chalk.red('Aborted. Please choose a different project name.'));
         return;
       } else {
         fs.rmdirSync(projectPath, { recursive: true });
+        console.log(chalk.yellow(`Removed existing directory '${projectName}'.`));
       }
     }
 
     fs.mkdirSync(projectPath);
-    console.log(
-      chalk.green(`Creating project '${projectName}' from template '${projectChoice}'...`)
-    );
-    generator(templatePath, projectName, projectName);
+    console.log(chalk.green(`Created project directory at ${projectPath}`));
+
+    console.log(chalk.green(`Creating project '${projectName}' from template...`));
+    await generator(templatePath, projectName, projectName);
     console.log(chalk.green('Project generation completed.'));
 
-    const installDeps = answers['install-deps'];
     if (installDeps) {
       const packageManagerAnswer = await inquirer.prompt([
         {
@@ -96,7 +159,6 @@ const createProject = async () => {
       console.log(chalk.yellow('Dependencies installed successfully.'));
     }
 
-    const initGit = answers['init-git'];
     if (initGit) {
       execSync('git init', { cwd: projectPath, stdio: 'inherit' });
       console.log(chalk.yellow('Git initialized.'));
@@ -108,12 +170,5 @@ const createProject = async () => {
     console.error(chalk.red('An error occurred:'), error);
   }
 };
-
-const handleCancellation = () => {
-  console.log(chalk.yellow('\nUser cancelled the prompt.'));
-  process.exit();
-};
-
-process.on('SIGINT', handleCancellation);
 
 createProject();

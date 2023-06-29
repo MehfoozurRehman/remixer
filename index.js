@@ -38,6 +38,12 @@ const QUESTIONS = [
     message: 'Do you want to install dependencies?',
     default: true,
   },
+  {
+    name: 'init-git',
+    type: 'confirm',
+    message: 'Do you want to initialize Git?',
+    default: true,
+  },
 ];
 
 const createProject = async () => {
@@ -88,6 +94,12 @@ const createProject = async () => {
         packageManager === 'yarn' ? 'yarn install' : 'npm install --legacy-peer-deps';
       execSync(installCommand, { cwd: projectPath, stdio: 'inherit' });
       console.log(chalk.yellow('Dependencies installed successfully.'));
+    }
+
+    const initGit = answers['init-git'];
+    if (initGit) {
+      execSync('git init', { cwd: projectPath, stdio: 'inherit' });
+      console.log(chalk.yellow('Git initialized.'));
     }
 
     console.log(chalk.green.bold('\nProject setup completed.'));

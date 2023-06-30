@@ -18,7 +18,6 @@ export default defineConfig({
       ...config.alias,
     },
   },
-
   plugins: [
     HotExport(),
     config.compression && chunkSplitPlugin(),

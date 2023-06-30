@@ -23,20 +23,24 @@ export default defineConfig({
           replacement: resolve("src/renderer/src"),
         },
         {
-          find: "components",
+          find: "@components",
           replacement: resolve("src/renderer/src/components"),
         },
         {
-          find: "assets",
+          find: "@assets",
           replacement: resolve("src/renderer/src/assets"),
         },
         {
-          find: "global",
+          find: "@global",
           replacement: resolve("src/renderer/src/global"),
         },
         {
-          find: "router",
+          find: "@router",
           replacement: resolve("src/renderer/src/router"),
+        },
+        {
+          find: "@layouts",
+          replacement: resolve("src/renderer/src/layouts"),
         },
       ],
     },

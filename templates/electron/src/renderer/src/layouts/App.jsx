@@ -1,20 +1,16 @@
-import { Footer, Header } from 'components';
-
+import { Head } from '@router';
 import { Outlet } from 'react-router-dom';
 
-export const meta = {
-  title: 'project_name',
-  description: 'project_name',
-  image: '/favicon.svg',
-  url: 'https://vitefilerouter.com',
-};
-
-export default function App() {
+export default () => {
   return (
     <>
-      <Header />
+      <Head
+        title="project_name"
+        image="/favicon.ico"
+        url="https://vitefilerouter.com"
+        description="project_name"
+      />
       <Outlet />
-      <Footer />
     </>
   );
-}
+};

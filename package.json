@@ -1,11 +1,14 @@
 {
   "name": "create-remixer",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Project for instantiating projects via cli",
   "main": "index.js",
   "type": "module",
   "bin": {
     "create-remixer": "./index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",

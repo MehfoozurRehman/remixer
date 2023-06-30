@@ -8,6 +8,17 @@ const CURR_DIR = process.cwd();
 const PROJECT_NAME_PLACEHOLDER = "project_name";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+const colorize = (text, color) => {
+  const colors = {
+    reset: "\x1b[0m",
+    red: "\x1b[31m",
+    green: "\x1b[32m",
+    yellow: "\x1b[33m",
+    cyan: "\x1b[36m",
+  };
+  return colors[color] + text + colors.reset;
+};
+
 const replaceProjectNamePlaceholder = (data, projectName) => {
   if (typeof data === "object") {
     if (Array.isArray(data)) {
@@ -174,7 +185,10 @@ const createProject = async () => {
     if (projectName === ".") {
       const currentDirName = path.basename(CURR_DIR);
       console.log(
-        `Using current directory name '${currentDirName}' as the project name.`
+        colorize(
+          `Using current directory name '${currentDirName}' as the project name.`,
+          "yellow"
+        )
       );
       finalProjectName = currentDirName;
     }
@@ -192,20 +206,37 @@ const createProject = async () => {
         },
       ]);
       if (!overwriteAnswer.overwrite) {
-        console.log("Aborted. Please choose a different project name.");
+        console.log(
+          colorize("Aborted. Please choose a different project name.", "red")
+        );
         return;
       } else {
         fs.rmdirSync(projectPath, { recursive: true });
-        console.log(`Removed existing directory '${finalProjectName}'.`);
+        console.log(
+          colorize(
+            `Removed existing directory '${finalProjectName}'.`,
+            "yellow"
+          )
+        );
       }
     }
 
     fs.mkdirSync(projectPath);
-    console.log(`Created project directory at ${projectPath}`);
+    console.log(
+      colorize(`Created project directory at ${projectPath}`, "green")
+    );
 
-    console.log(`Creating project '${finalProjectName}' from template...`);
+    console.log(
+      colorize(
+        `Creating project '${finalProjectName}' from template '${projectChoice}'...`,
+        "cyan"
+      )
+    );
     await generator(templatePath, finalProjectName, finalProjectName);
-    console.log("Project generation completed.");
+
+    console.log(
+      colorize(`Project '${finalProjectName}' generated successfully!`, "green")
+    );
 
     if (installDeps) {
       const packageManagerAnswer = await inquirer.prompt([
@@ -224,20 +255,23 @@ const createProject = async () => {
           : "npm install --legacy-peer-deps";
       execSync(installCommand, { cwd: projectPath, stdio: "inherit" });
       console.log("Dependency installation completed.");
+      console.log(colorize(`Dependencies installed successfully!`, "green"));
     }
 
     if (initGit) {
-      console.log("Initializing Git repository...");
+      console.log(colorize(`Initializing Git repository...`, "cyan"));
       execSync("git init", { cwd: projectPath, stdio: "inherit" });
-      console.log("Git initialization completed.");
+      console.log(
+        colorize(`Git repository initialized successfully!`, "green")
+      );
     }
 
-    console.log("\nProject setup completed.");
-    console.log(
-      `Your project '${finalProjectName}' is ready at ${projectPath}`
-    );
+    console.log(colorize("All set! Happy coding!", "green"));
   } catch (error) {
-    console.error("An error occurred:", error);
+    console.log(
+      colorize("An error occurred while generating the project.", "red")
+    );
+    console.error(error);
   }
 };
 

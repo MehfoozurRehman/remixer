@@ -248,14 +248,15 @@ const createProject = async () => {
         },
       ]);
       const packageManager = packageManagerAnswer["package-manager"];
-      console.log(`Installing dependencies with ${packageManager}...`);
+      console.log(
+        colorize(`Installing dependencies with ${packageManager}...`, "cyan")
+      );
       const installCommand =
         packageManager === "yarn"
           ? "yarn install"
           : "npm install --legacy-peer-deps";
       execSync(installCommand, { cwd: projectPath, stdio: "inherit" });
-      console.log("Dependency installation completed.");
-      console.log(colorize(`Dependencies installed successfully!`, "green"));
+      console.log(colorize("Dependency installation completed.", "green"));
     }
 
     if (initGit) {

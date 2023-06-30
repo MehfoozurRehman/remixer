@@ -1,6 +1,6 @@
 {
   "name": "create-remixer",
-  "version": "2.0.2",
+  "version": "2.0.5",
   "description": "Project for instantiating projects via cli",
   "main": "index.js",
   "type": "module",
@@ -18,9 +18,7 @@
   },
   "homepage": "https://github.com//MehfoozurRehman/remixer#readme",
   "dependencies": {
-    "chalk": "^5.3.0",
-    "inquirer": "^9.2.7",
-    "js-yaml": "^4.1.0"
+    "inquirer": "^9.2.7"
   },
   "devDependencies": {
     "@babel/core": "^7.22.5"

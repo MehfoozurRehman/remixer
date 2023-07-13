@@ -2,19 +2,23 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { Suspense, lazy } from "react";
 
 import App from "@layouts/App";
+import ErrorBoundary from "@layouts/Error";
 import Loading from "@layouts/Loading";
 import NotFound from "@layouts/NotFound";
 
+// Check if Loading component exists
 if (!Loading) {
-  console.error("No loader file found in layouts folder");
+  console.error("No loader file found in the layouts folder");
 }
 
+// Check if NotFound component exists
 if (!NotFound) {
-  console.error("No Not found file found in layouts folder");
+  console.error("No Not found file found in the layouts folder");
 }
 
 const regexCache = new Map();
 
+// Function to get the matching route based on the path
 export const getMatchingRoute = (path) => {
   for (const route of LazyRoutes) {
     let regex = regexCache.get(route.path);
@@ -31,19 +35,22 @@ export const getMatchingRoute = (path) => {
   return null;
 };
 
+// Function to handle action for a route
 const Action = async (routes, ...args) => {
   const { action } = await routes();
   return action ? action(...args) : null;
 };
 
+// Function to load the component for a route
 const Loader = async (routes, ...args) => {
   const { loader } = await routes();
   return loader ? loader(...args) : null;
 };
 
+// Function to handle errors for a route
 const ErrorBoundaryLoad = async (routes, ...args) => {
-  const { Error } = await routes();
-  return Error ? Error(...args) : null;
+  const { ErrorBoundary } = await routes();
+  return ErrorBoundary ? ErrorBoundary(...args) : null;
 };
 
 function RoutesReducer(eagers, lazys) {
@@ -55,7 +62,7 @@ function RoutesReducer(eagers, lazys) {
     const loader = eagers ? eagers?.[key]?.loader : Loader(module);
     const action = eagers ? eagers?.[key]?.action : Action(module);
     const ErrorBoundary = eagers
-      ? eagers?.[key]?.Error
+      ? eagers?.[key]?.ErrorBoundary
       : ErrorBoundaryLoad(module);
 
     const segments = key
@@ -127,12 +134,15 @@ const EagerRoutes = RoutesReducer(EAGER_ROUTES, {});
 
 import.meta.glob("/src/styles/*.(scss|css)", { eager: true });
 
-if (!LazyRoutes.length && !EagerRoutes.length) console.error("No routes found");
+if (!LazyRoutes.length && !EagerRoutes.length) {
+  console.error("No routes found");
+}
 
 const router = createBrowserRouter([
   {
     path: "/",
     Component: App,
+    ErrorBoundary: ErrorBoundary,
     children: [...EagerRoutes, ...LazyRoutes],
   },
   { path: "*", Component: NotFound },

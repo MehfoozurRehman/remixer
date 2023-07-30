@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { getMatchingRoute } from "./Router";
+import getMatchingRoute from "./getMatchingRoute";
 
 export default (to, prefetch = true) => {
   const [prefetched, setPrefetched] = useState(false);

@@ -30,11 +30,18 @@ const getLoader = async (module, ...args) => {
 // Define a function that creates a route object from a given module
 const createRoute = (module, isEager) => {
   const Component = isEager ? module.default : lazy(module);
+
+  const element = (
+    <Suspense fallback={<Loading />}>
+      <Component />
+    </Suspense>
+  );
+  const errorElement = <ErrorBoundary />;
   const preload = isEager ? null : module;
   const loader = isEager ? module?.loader : getLoader.bind(null, module);
   const action = isEager ? module?.action : getAction.bind(null, module);
 
-  return { Component, loader, action, preload };
+  return { element, loader, action, preload, errorElement };
 };
 
 // Define a function that creates an array of path segments from a given key
@@ -123,8 +130,4 @@ const router = createBrowserRouter([
 ]);
 
 // Export a component that renders the router object
-export default () => (
-  <Suspense fallback={<Loading />}>
-    <RouterProvider router={router} />
-  </Suspense>
-);
+export default () => <RouterProvider router={router} />;

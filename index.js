@@ -45,95 +45,110 @@ const replaceProjectNamePlaceholder = (data, projectName) => {
 };
 
 const generator = async (templatePath, newProjectPath, projectName) => {
-  const filesToCreate = await fs.promises.readdir(templatePath);
+  try {
+    const filesToCreate = await fs.promises.readdir(templatePath);
 
-  for (const file of filesToCreate) {
-    const origFilePath = path.join(templatePath, file);
-    const stats = await fs.promises.stat(origFilePath);
+    for (const file of filesToCreate) {
+      const origFilePath = path.join(templatePath, file);
+      const stats = await fs.promises.stat(origFilePath);
 
-    if (stats.isFile()) {
-      const writePath = path.join(CURR_DIR, newProjectPath, file);
-      const fileExt = path.extname(file);
+      if (stats.isFile()) {
+        const writePath = path.join(CURR_DIR, newProjectPath, file);
+        const fileExt = path.extname(file);
 
-      if (
-        [".js", ".jsx", ".html", ".md", ".tsx", ".yml", ".yaml"].includes(
-          fileExt
-        ) ||
-        file.startsWith(".")
-      ) {
-        let contents = await fs.promises.readFile(origFilePath, "utf8");
+        if (
+          [".js", ".jsx", ".html", ".md", ".tsx", ".yml", ".yaml"].includes(
+            fileExt
+          ) ||
+          file.startsWith(".")
+        ) {
+          let contents = await fs.promises.readFile(origFilePath, "utf8");
 
-        if ([".yml", ".yaml"].includes(fileExt)) {
-          const yamlData = JSON.parse(await convertYamlToJson(contents));
-          const updatedYamlData = replaceProjectNamePlaceholder(
-            yamlData,
-            projectName
+          if ([".yml", ".yaml"].includes(fileExt)) {
+            const yamlData = JSON.parse(await convertYamlToJson(contents));
+            const updatedYamlData = replaceProjectNamePlaceholder(
+              yamlData,
+              projectName
+            );
+            contents = await convertJsonToYaml(updatedYamlData);
+          } else {
+            contents = contents.replace(
+              new RegExp(PROJECT_NAME_PLACEHOLDER, "g"),
+              projectName
+            );
+          }
+
+          await fs.promises.writeFile(writePath, contents, "utf8");
+        } else if (file === "package.json") {
+          let contents = await fs.promises.readFile(origFilePath, "utf8");
+          const packageJson = JSON.parse(contents);
+          packageJson.name = projectName;
+          await fs.promises.writeFile(
+            writePath,
+            JSON.stringify(packageJson, null, 2),
+            "utf8"
           );
-          contents = await convertJsonToYaml(updatedYamlData);
         } else {
-          contents = contents.replace(
-            new RegExp(PROJECT_NAME_PLACEHOLDER, "g"),
-            projectName
-          );
+          const readStream = fs.createReadStream(origFilePath);
+          const writeStream = fs.createWriteStream(writePath);
+          readStream.pipe(writeStream);
         }
-
-        await fs.promises.writeFile(writePath, contents, "utf8");
-      } else if (file === "package.json") {
-        let contents = await fs.promises.readFile(origFilePath, "utf8");
-        const packageJson = JSON.parse(contents);
-        packageJson.name = projectName;
-        await fs.promises.writeFile(
-          writePath,
-          JSON.stringify(packageJson, null, 2),
-          "utf8"
+      } else if (stats.isDirectory()) {
+        const newDirPath = path.join(CURR_DIR, newProjectPath, file);
+        await fs.promises.mkdir(newDirPath, { recursive: true });
+        await generator(
+          path.join(templatePath, file),
+          path.join(newProjectPath, file),
+          projectName
         );
-      } else {
-        const readStream = fs.createReadStream(origFilePath);
-        const writeStream = fs.createWriteStream(writePath);
-        readStream.pipe(writeStream);
       }
-    } else if (stats.isDirectory()) {
-      const newDirPath = path.join(CURR_DIR, newProjectPath, file);
-      await fs.promises.mkdir(newDirPath);
-      await generator(
-        path.join(templatePath, file),
-        path.join(newProjectPath, file),
-        projectName
-      );
     }
+  } catch (error) {
+    console.error(error);
+    throw new Error(`Error generating project: ${error.message}`);
   }
 };
 
 const convertYamlToJson = async (yamlData) => {
-  const lines = yamlData.split("\n");
-  const jsonData = {};
+  try {
+    const lines = yamlData.split("\n");
+    const jsonData = {};
 
-  for (const line of lines) {
-    const trimmedLine = line.trim();
-    if (trimmedLine.startsWith("#") || trimmedLine === "") {
-      continue;
+    for (const line of lines) {
+      const trimmedLine = line.trim();
+      if (trimmedLine.startsWith("#") || trimmedLine === "") {
+        continue;
+      }
+
+      const [key, value] = trimmedLine.split(":");
+      jsonData[key.trim()] = value ? value.trim() : {};
     }
 
-    const [key, value] = trimmedLine.split(":");
-    jsonData[key.trim()] = value ? value.trim() : {};
+    return JSON.stringify(jsonData, null, 2);
+  } catch (error) {
+    console.error(error);
+    throw new Error(`Error converting YAML to JSON: ${error.message}`);
   }
-
-  return JSON.stringify(jsonData, null, 2);
 };
 
 const convertJsonToYaml = async (jsonData) => {
-  let yamlData = "";
-  for (const key in jsonData) {
-    if (typeof jsonData[key] === "object") {
-      yamlData += `${key}:\n`;
-      for (const subKey in jsonData[key]) {
-        yamlData += `  ${subKey}: ${jsonData[key][subKey]}\n`;
+  try {
+    let yamlData = "";
+    for (const key in jsonData) {
+      if (typeof jsonData[key] === "object") {
+        yamlData += `${key}:\n`;
+        for (const subKey in jsonData[key]) {
+          yamlData += `  ${subKey}: ${jsonData[key][subKey]}\n`;
+        }
+      } else {
+        yamlData += `${key}: ${jsonData[key]}\n`;
       }
-    } else {
-      yamlData += `${key}: ${jsonData[key]}\n`;
     }
+    return yamlData;
+  } catch (error) {
+    console.error(error);
+    throw new Error(`Error converting JSON to YAML: ${error.message}`);
   }
-  return yamlData;
 };
 
 const CHOICES = fs.readdirSync(`${__dirname}/templates`);
@@ -224,7 +239,7 @@ const createProject = async () => {
       }
     }
 
-    fs.mkdirSync(projectPath);
+    await fs.promises.mkdir(projectPath, { recursive: true });
     console.log(
       colorize(`Created project directory at ${projectPath}`, "green")
     );
@@ -272,10 +287,10 @@ const createProject = async () => {
 
     console.log(colorize("All set! Happy coding!", "green"));
   } catch (error) {
+    console.error(error);
     console.log(
       colorize("An error occurred while generating the project.", "red")
     );
-    console.error(error);
   }
 };
 

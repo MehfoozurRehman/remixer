@@ -24,6 +24,6 @@
     "inquirer": "^9.2.10"
   },
   "devDependencies": {
-    "@babel/core": "^7.22.10"
+    "@babel/core": "^7.22.11"
   }
 }

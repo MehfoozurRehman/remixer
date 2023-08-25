@@ -58,7 +58,8 @@ const generator = async (templatePath, newProjectPath, projectName) => {
       if (
         [".js", ".jsx", ".html", ".md", ".tsx", ".yml", ".yaml"].includes(
           fileExt
-        ) || file.startsWith('.')
+        ) ||
+        file.startsWith(".")
       ) {
         let contents = await fs.promises.readFile(origFilePath, "utf8");
 

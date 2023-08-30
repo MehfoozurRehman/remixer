@@ -10,16 +10,14 @@ const CURR_DIR = process.cwd();
 const PROJECT_NAME_PLACEHOLDER = "project_name";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const colorize = (text, color) => {
-  const colors = {
-    reset: "\x1b[0m",
-    red: "\x1b[31m",
-    green: "\x1b[32m",
-    yellow: "\x1b[33m",
-    cyan: "\x1b[36m",
-  };
-  return colors[color] + text + colors.reset;
+const colors = {
+  reset: "\x1b[0m",
+  red: "\x1b[31m",
+  green: "\x1b[32m",
+  yellow: "\x1b[33m",
+  cyan: "\x1b[36m",
 };
+const colorize = (text, color) => colors[color] + text + colors.reset;
 
 const replaceProjectNamePlaceholder = (data, projectName) => {
   if (typeof data === "object") {
@@ -30,10 +28,12 @@ const replaceProjectNamePlaceholder = (data, projectName) => {
     } else {
       const updatedData = {};
       for (const key in data) {
-        updatedData[key] = replaceProjectNamePlaceholder(
-          data[key],
-          projectName
-        );
+        if (Object.hasOwnProperty.call(data, key)) {
+          updatedData[key] = replaceProjectNamePlaceholder(
+            data[key],
+            projectName
+          );
+        }
       }
       return updatedData;
     }
@@ -109,19 +109,20 @@ const generator = async (templatePath, newProjectPath, projectName) => {
   }
 };
 
-const convertYamlToJson = async (yamlData) => {
+const convertYamlToJson = (yamlData) => {
   try {
     const lines = yamlData.split("\n");
     const jsonData = {};
 
     for (const line of lines) {
       const trimmedLine = line.trim();
+
       if (trimmedLine.startsWith("#") || trimmedLine === "") {
         continue;
       }
 
-      const [key, value] = trimmedLine.split(":");
-      jsonData[key.trim()] = value ? value.trim() : {};
+      const [key, value] = trimmedLine.split(":").map((item) => item.trim());
+      jsonData[key] = value || {};
     }
 
     return JSON.stringify(jsonData, null, 2);
@@ -131,19 +132,22 @@ const convertYamlToJson = async (yamlData) => {
   }
 };
 
-const convertJsonToYaml = async (jsonData) => {
+const convertJsonToYaml = (jsonData) => {
   try {
-    let yamlData = "";
-    for (const key in jsonData) {
-      if (typeof jsonData[key] === "object") {
-        yamlData += `${key}:\n`;
-        for (const subKey in jsonData[key]) {
-          yamlData += `  ${subKey}: ${jsonData[key][subKey]}\n`;
+    const generateYamlRecursively = (data, indent = "") => {
+      let yamlData = "";
+      for (const key in data) {
+        if (typeof data[key] === "object") {
+          yamlData += `${indent}${key}:\n`;
+          yamlData += generateYamlRecursively(data[key], `${indent}  `);
+        } else {
+          yamlData += `${indent}${key}: ${data[key]}\n`;
         }
-      } else {
-        yamlData += `${key}: ${jsonData[key]}\n`;
       }
-    }
+      return yamlData;
+    };
+
+    const yamlData = generateYamlRecursively(jsonData);
     return yamlData;
   } catch (error) {
     console.error(error);
@@ -158,22 +162,20 @@ const QUESTIONS = [
     name: "project-name",
     type: "input",
     message: "Project name:",
-    validate: function (input) {
-      return /^([A-Za-z\-\\_\d.])+$/.test(input)
+    validate: (input) =>
+      /^([A-Za-z\-\\_\d.])+$/.test(input)
         ? true
-        : "Project name may only include letters, numbers, underscores, hashes, and dots.";
-    },
+        : "Project name may only include letters, numbers, underscores, hashes, and dots.",
   },
   {
     name: "project-choice",
     type: "list",
     message: "What project template would you like to generate?",
     choices: CHOICES,
-    validate: function (input) {
-      return CHOICES.includes(input)
+    validate: (input) =>
+      CHOICES.includes(input)
         ? true
-        : "Please select a valid project template.";
-    },
+        : "Please select a valid project template.",
   },
   {
     name: "install-deps",

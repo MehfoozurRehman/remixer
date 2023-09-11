@@ -17,7 +17,7 @@
   "dependencies": {
     "@electron-toolkit/preload": "^2.0.0",
     "@electron-toolkit/utils": "^2.0.0",
-    "electron-updater": "^6.1.1",
+    "electron-updater": "^6.1.4",
     "react-helmet": "^6.1.0",
     "react-router-dom": "^6.15.0",
     "sass": "^1.66.1"
@@ -25,12 +25,12 @@
   "devDependencies": {
     "@electron-toolkit/tsconfig": "^1.0.1",
     "@electron/notarize": "^2.1.0",
-    "@types/node": "20.5.7",
+    "@types/node": "20.6.0",
     "@types/react": "18.2.21",
     "@types/react-dom": "18.2.7",
     "@vitejs/plugin-react": "^4.0.4",
-    "electron": "^26.1.0",
-    "electron-builder": "^24.6.3",
+    "electron": "^26.2.0",
+    "electron-builder": "^24.6.4",
     "electron-vite": "^1.0.27",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -40,7 +40,7 @@
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-hot-export": "^0.5.9",
     "vite-plugin-imagemin": "^0.6.1",
-    "vite-plugin-pwa": "^0.16.4",
+    "vite-plugin-pwa": "^0.16.5",
     "vite-plugin-webfont-dl": "^3.7.6"
   }
 }

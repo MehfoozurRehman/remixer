@@ -38,7 +38,11 @@ const replaceProjectNamePlaceholder = (data, projectName) => {
   }
 };
 
-const generator = async (templatePath, newProjectPath, projectName) => {
+const generateProjectFiles = async (
+  templatePath,
+  newProjectPath,
+  projectName
+) => {
   try {
     const filesToCreate = await fs.promises.readdir(templatePath);
 
@@ -47,52 +51,12 @@ const generator = async (templatePath, newProjectPath, projectName) => {
       const stats = await fs.promises.stat(origFilePath);
 
       if (stats.isFile()) {
-        const writePath = path.join(CURR_DIR, newProjectPath, file);
-        const fileExt = path.extname(file);
-
-        if (
-          [".js", ".jsx", ".html", ".md", ".tsx", ".yml", ".yaml"].includes(
-            fileExt
-          ) ||
-          file.startsWith(".")
-        ) {
-          let contents = await fs.promises.readFile(origFilePath, "utf8");
-
-          if ([".yml", ".yaml"].includes(fileExt)) {
-            const yamlData = JSON.parse(await convertYamlToJson(contents));
-            const updatedYamlData = replaceProjectNamePlaceholder(
-              yamlData,
-              projectName
-            );
-            contents = await convertJsonToYaml(updatedYamlData);
-          } else {
-            contents = contents.replace(
-              new RegExp(PROJECT_NAME_PLACEHOLDER, "g"),
-              projectName
-            );
-          }
-
-          await fs.promises.writeFile(writePath, contents, "utf8");
-        } else if (file === "package.json") {
-          let contents = await fs.promises.readFile(origFilePath, "utf8");
-          const packageJson = JSON.parse(contents);
-          packageJson.name = projectName;
-          await fs.promises.writeFile(
-            writePath,
-            JSON.stringify(packageJson, null, 2),
-            "utf8"
-          );
-        } else {
-          const readStream = fs.createReadStream(origFilePath);
-          const writeStream = fs.createWriteStream(writePath);
-          readStream.pipe(writeStream);
-        }
+        await generateFile(origFilePath, file, newProjectPath, projectName);
       } else if (stats.isDirectory()) {
-        const newDirPath = path.join(CURR_DIR, newProjectPath, file);
-        await fs.promises.mkdir(newDirPath, { recursive: true });
-        await generator(
-          path.join(templatePath, file),
-          path.join(newProjectPath, file),
+        await generateDirectory(
+          origFilePath,
+          file,
+          newProjectPath,
           projectName
         );
       }
@@ -103,41 +67,68 @@ const generator = async (templatePath, newProjectPath, projectName) => {
   }
 };
 
-const CHOICES = fs.readdirSync(`${__dirname}/templates`);
+const generateFile = async (
+  origFilePath,
+  file,
+  newProjectPath,
+  projectName
+) => {
+  const writePath = path.join(CURR_DIR, newProjectPath, file);
+  const fileExt = path.extname(file);
 
-const QUESTIONS = [
-  {
-    name: "project-name",
-    type: "input",
-    message: "Project name:",
-    validate: (input) =>
-      /^([A-Za-z\-\\_\d.])+$/.test(input)
-        ? true
-        : "Project name may only include letters, numbers, underscores, hashes, and dots.",
-  },
-  {
-    name: "project-choice",
-    type: "list",
-    message: "What project template would you like to generate?",
-    choices: CHOICES,
-    validate: (input) =>
-      CHOICES.includes(input)
-        ? true
-        : "Please select a valid project template.",
-  },
-  {
-    name: "install-deps",
-    type: "confirm",
-    message: "Do you want to install dependencies?",
-    default: true,
-  },
-  {
-    name: "init-git",
-    type: "confirm",
-    message: "Do you want to initialize Git?",
-    default: true,
-  },
-];
+  if (
+    [".js", ".jsx", ".html", ".md", ".tsx", ".yml", ".yaml"].includes(
+      fileExt
+    ) ||
+    file.startsWith(".")
+  ) {
+    let contents = await fs.promises.readFile(origFilePath, "utf8");
+
+    if ([".yml", ".yaml"].includes(fileExt)) {
+      const yamlData = JSON.parse(convertYamlToJson(contents));
+      const updatedYamlData = replaceProjectNamePlaceholder(
+        yamlData,
+        projectName
+      );
+      contents = convertJsonToYaml(updatedYamlData);
+    } else {
+      contents = contents.replace(
+        new RegExp(PROJECT_NAME_PLACEHOLDER, "g"),
+        projectName
+      );
+    }
+
+    await fs.promises.writeFile(writePath, contents, "utf8");
+  } else if (file === "package.json") {
+    let contents = await fs.promises.readFile(origFilePath, "utf8");
+    const packageJson = JSON.parse(contents);
+    packageJson.name = projectName;
+    await fs.promises.writeFile(
+      writePath,
+      JSON.stringify(packageJson, null, 2),
+      "utf8"
+    );
+  } else {
+    const readStream = fs.createReadStream(origFilePath);
+    const writeStream = fs.createWriteStream(writePath);
+    readStream.pipe(writeStream);
+  }
+};
+
+const generateDirectory = async (
+  origFilePath,
+  file,
+  newProjectPath,
+  projectName
+) => {
+  const newDirPath = path.join(CURR_DIR, newProjectPath, file);
+  await fs.promises.mkdir(newDirPath, { recursive: true });
+  await generateProjectFiles(
+    path.join(origFilePath),
+    path.join(newProjectPath, file),
+    projectName
+  );
+};
 
 const createProject = async () => {
   try {
@@ -200,7 +191,11 @@ const createProject = async () => {
         "cyan"
       )
     );
-    await generator(templatePath, finalProjectName, finalProjectName);
+    await generateProjectFiles(
+      templatePath,
+      finalProjectName,
+      finalProjectName
+    );
 
     console.log(
       colorize(`Project '${finalProjectName}' generated successfully!`, "green")
@@ -244,4 +239,48 @@ const createProject = async () => {
   }
 };
 
-createProject();
+const CHOICES = fs.readdirSync(`${__dirname}/templates`);
+
+const QUESTIONS = [
+  {
+    name: "project-name",
+    type: "input",
+    message: "Project name:",
+    validate: (input) =>
+      /^([A-Za-z\-\\_\d.])+$/.test(input)
+        ? true
+        : "Project name may only include letters, numbers, underscores, hashes, and dots.",
+  },
+  {
+    name: "project-choice",
+    type: "list",
+    message: "What project template would you like to generate?",
+    choices: CHOICES,
+    validate: (input) =>
+      CHOICES.includes(input)
+        ? true
+        : "Please select a valid project template.",
+  },
+  {
+    name: "install-deps",
+    type: "confirm",
+    message: "Do you want to install dependencies?",
+    default: true,
+  },
+  {
+    name: "init-git",
+    type: "confirm",
+    message: "Do you want to initialize Git?",
+    default: true,
+  },
+];
+
+const main = async () => {
+  try {
+    await createProject();
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+main();

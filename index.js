@@ -133,9 +133,12 @@ const generateDirectory = async (
 
 const askQuestions = async () => {
   const templates = [
-    { name: "Node.js", url: "https://github.com/nodejs/node.git" },
-    { name: "React", url: "https://github.com/facebook/react.git" },
-    { name: "Vue.js", url: "https://github.com/vuejs/vue.git" },
+    { name: "api", url: "https://github.com/MehfoozurRehman/remixer-api.git" },
+    { name: "web", url: "https://github.com/MehfoozurRehman/remixer-web.git" },
+    {
+      name: "electron",
+      url: "https://github.com/MehfoozurRehman/remixer-electron.git",
+    },
   ];
   const templateChoices = templates.map((template) => template.name);
   const answers = await inquirer.prompt([

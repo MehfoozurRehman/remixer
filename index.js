@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 
-import colorize from "./colorize";
-import convertJsonToYaml from "./convertJsonToYaml";
-import convertYamlToJson from "./convertYamlToJson";
+import colorize from "./colorize.js";
+import convertJsonToYaml from "./convertJsonToYaml.js";
+import convertYamlToJson from "./convertYamlToJson.js";
 import { execSync } from "child_process";
-import { fileURLToPath } from "url";
 import fs from "fs";
 import inquirer from "inquirer";
 import path from "path";
@@ -12,7 +11,6 @@ import simpleGit from "simple-git";
 
 const CURR_DIR = process.cwd();
 const PROJECT_NAME_PLACEHOLDER = "project_name";
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const replaceProjectNamePlaceholder = (data, projectName) => {
   if (typeof data === "object") {

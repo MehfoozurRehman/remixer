@@ -8,6 +8,7 @@ import { fileURLToPath } from "url";
 import fs from "fs";
 import inquirer from "inquirer";
 import path from "path";
+import simpleGit from "simple-git";
 
 const CURR_DIR = process.cwd();
 const PROJECT_NAME_PLACEHOLDER = "project_name";
@@ -131,31 +132,53 @@ const generateDirectory = async (
 };
 
 const askQuestions = async () => {
-  const answers = await inquirer.prompt(QUESTIONS);
-  const {
-    "project-choice": projectChoice,
-    "project-name": projectName,
-    "install-deps": installDeps,
-    "init-git": initGit,
-  } = answers;
-
-  let finalProjectName = projectName;
-  if (projectName === ".") {
-    const currentDirName = path.basename(CURR_DIR);
-    console.log(
-      colorize(
-        `Using current directory name '${currentDirName}' as the project name.`,
-        "yellow"
-      )
-    );
-    finalProjectName = currentDirName;
-  }
-
+  const templates = [
+    { name: "Node.js", url: "https://github.com/nodejs/node.git" },
+    { name: "React", url: "https://github.com/facebook/react.git" },
+    { name: "Vue.js", url: "https://github.com/vuejs/vue.git" },
+  ];
+  const templateChoices = templates.map((template) => template.name);
+  const answers = await inquirer.prompt([
+    {
+      name: "project-name",
+      type: "input",
+      message: "Project name:",
+      validate: (input) =>
+        /^([A-Za-z\-\\_\d.])+$/.test(input)
+          ? true
+          : "Project name may only include letters, numbers, underscores, hashes, and dots.",
+    },
+    {
+      name: "project-choice",
+      type: "list",
+      message: "What project template would you like to generate?",
+      choices: templateChoices,
+      validate: (input) =>
+        templateChoices.includes(input)
+          ? true
+          : "Please select a valid project template.",
+    },
+    {
+      name: "install-deps",
+      type: "confirm",
+      message: "Do you want to install dependencies?",
+      default: true,
+    },
+    {
+      name: "init-git",
+      type: "confirm",
+      message: "Do you want to initialize Git?",
+      default: true,
+    },
+  ]);
+  const selectedTemplate = templates.find(
+    (template) => template.name === answers["project-choice"]
+  );
   return {
-    projectChoice,
-    finalProjectName,
-    installDeps,
-    initGit,
+    projectName: answers["project-name"],
+    templateUrl: selectedTemplate.url,
+    installDeps: answers["install-deps"],
+    initGit: answers["init-git"],
   };
 };
 
@@ -187,14 +210,14 @@ const createProjectDirectory = async (projectPath) => {
   console.log(colorize(`Created project directory at ${projectPath}`, "green"));
 };
 
-const generateProjectFromTemplate = async (templatePath, finalProjectName) => {
+const generateProjectFromTemplate = async (templateUrl, finalProjectName) => {
   console.log(
     colorize(
-      `Creating project '${finalProjectName}' from template '${projectChoice}'...`,
+      `Creating project '${finalProjectName}' from template '${templateUrl}'...`,
       "cyan"
     )
   );
-  await generateProjectFiles(templatePath, finalProjectName, finalProjectName);
+  await simpleGit().clone(templateUrl, finalProjectName);
   console.log(
     colorize(`Project '${finalProjectName}' generated successfully!`, "green")
   );
@@ -230,19 +253,19 @@ const installDependencies = async (projectPath, packageManager) => {
   console.log(colorize("Dependency installation completed.", "green"));
 };
 
-const initializeGitRepository = async (projectPath) => {
+const initializeGitRepositoryFromScratch = async (projectPath) => {
   console.log(colorize(`Initializing Git repository...`, "cyan"));
-  execSync("git init", { cwd: projectPath, stdio: "inherit" });
+  const git = simpleGit(projectPath);
+  await git.init();
   console.log(colorize(`Git repository initialized successfully!`, "green"));
 };
 
 const createProject = async () => {
   try {
-    const { projectChoice, finalProjectName, installDeps, initGit } =
+    const { projectName, templateUrl, installDeps, initGit } =
       await askQuestions();
 
-    const templatePath = path.join(__dirname, "templates", projectChoice);
-    const projectPath = path.join(CURR_DIR, finalProjectName);
+    const projectPath = path.join(CURR_DIR, projectName);
 
     if (fs.existsSync(projectPath)) {
       const shouldOverwrite = await confirmOverwrite(projectPath);
@@ -253,7 +276,7 @@ const createProject = async () => {
 
     await createProjectDirectory(projectPath);
 
-    await generateProjectFromTemplate(templatePath, finalProjectName);
+    await generateProjectFromTemplate(templateUrl, projectName);
 
     console.log(colorize("Project generated successfully!", "green"));
 
@@ -271,7 +294,7 @@ const createProject = async () => {
     }
 
     if (initGit) {
-      await initializeGitRepository(projectPath);
+      await initializeGitRepositoryFromScratch(projectPath);
     }
 
     console.log(colorize("All set! Happy coding!", "green"));
@@ -282,42 +305,6 @@ const createProject = async () => {
     );
   }
 };
-
-const CHOICES = fs.readdirSync(`${__dirname}/templates`);
-
-const QUESTIONS = [
-  {
-    name: "project-name",
-    type: "input",
-    message: "Project name:",
-    validate: (input) =>
-      /^([A-Za-z\-\\_\d.])+$/.test(input)
-        ? true
-        : "Project name may only include letters, numbers, underscores, hashes, and dots.",
-  },
-  {
-    name: "project-choice",
-    type: "list",
-    message: "What project template would you like to generate?",
-    choices: CHOICES,
-    validate: (input) =>
-      CHOICES.includes(input)
-        ? true
-        : "Please select a valid project template.",
-  },
-  {
-    name: "install-deps",
-    type: "confirm",
-    message: "Do you want to install dependencies?",
-    default: true,
-  },
-  {
-    name: "init-git",
-    type: "confirm",
-    message: "Do you want to initialize Git?",
-    default: true,
-  },
-];
 
 const main = async () => {
   try {

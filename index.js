@@ -207,17 +207,27 @@ const createProject = async () => {
           name: "package-manager",
           type: "list",
           message: "Select a package manager:",
-          choices: ["npm", "yarn"],
+          choices: ["npm", "yarn", "pnpm"],
         },
       ]);
       const packageManager = packageManagerAnswer["package-manager"];
       console.log(
         colorize(`Installing dependencies with ${packageManager}...`, "cyan")
       );
-      const installCommand =
-        packageManager === "yarn"
-          ? "yarn install"
-          : "npm install --legacy-peer-deps";
+      let installCommand;
+      switch (packageManager) {
+        case "npm":
+          installCommand = "npm install --legacy-peer-deps";
+          break;
+        case "yarn":
+          installCommand = "yarn install";
+          break;
+        case "pnpm":
+          installCommand = "pnpm install";
+          break;
+        default:
+          throw new Error(`Invalid package manager: ${packageManager}`);
+      }
       execSync(installCommand, { cwd: projectPath, stdio: "inherit" });
       console.log(colorize("Dependency installation completed.", "green"));
     }

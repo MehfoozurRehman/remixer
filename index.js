@@ -260,58 +260,80 @@ const confirmOverwrite = async (projectPath, finalProjectName) => {
 };
 
 const createProjectDirectory = async (projectPath) => {
-  await fs.promises.mkdir(projectPath, { recursive: true });
-  console.log(colorize(`Created project directory at ${projectPath}`, "green"));
+  try {
+    await fs.promises.mkdir(projectPath, { recursive: true });
+    console.log(
+      colorize(`Created project directory at ${projectPath}`, "green")
+    );
+  } catch (error) {
+    console.error(error);
+    throw new Error(`Error creating project directory: ${error.message}`);
+  }
 };
 
 const generateProjectFromTemplate = async (templateUrl, finalProjectName) => {
-  console.log(
-    colorize(
-      `Creating project '${finalProjectName}' from template '${templateUrl}'...`,
-      "cyan"
-    )
-  );
-  await simpleGit().clone(templateUrl, finalProjectName);
-  console.log(
-    colorize(`Project '${finalProjectName}' generated successfully!`, "green")
-  );
+  try {
+    console.log(
+      colorize(
+        `Creating project '${finalProjectName}' from template '${templateUrl}'...`,
+        "cyan"
+      )
+    );
+    await simpleGit().clone(templateUrl, finalProjectName);
+    console.log(
+      colorize(`Project '${finalProjectName}' generated successfully!`, "green")
+    );
+  } catch (error) {
+    console.error(error);
+    throw new Error(`Error generating project from template: ${error.message}`);
+  }
 };
 
 const installDependencies = async (projectPath, packageManager) => {
-  console.log(
-    colorize(`Installing dependencies with ${packageManager}...`, "cyan")
-  );
-  let installCommand;
-  switch (packageManager) {
-    case "npm":
-      installCommand = "npm install --legacy-peer-deps";
-      break;
-    case "yarn":
-      if (!fs.existsSync(path.join(process.env.APPDATA, "npm/yarn.cmd"))) {
-        console.log(colorize("Installing yarn globally...", "cyan"));
-        execSync("npm install -g yarn", { stdio: "inherit" });
-      }
-      installCommand = "yarn install";
-      break;
-    case "pnpm":
-      if (!fs.existsSync(path.join(process.env.APPDATA, "npm/pnpm.cmd"))) {
-        console.log(colorize("Installing pnpm globally...", "cyan"));
-        execSync("npm install -g pnpm", { stdio: "inherit" });
-      }
-      installCommand = "pnpm install";
-      break;
-    default:
-      throw new Error(`Invalid package manager: ${packageManager}`);
+  try {
+    console.log(
+      colorize(`Installing dependencies with ${packageManager}...`, "cyan")
+    );
+    let installCommand;
+    switch (packageManager) {
+      case "npm":
+        installCommand = "npm install --legacy-peer-deps";
+        break;
+      case "yarn":
+        if (!fs.existsSync(path.join(process.env.APPDATA, "npm/yarn.cmd"))) {
+          console.log(colorize("Installing yarn globally...", "cyan"));
+          execSync("npm install -g yarn", { stdio: "inherit" });
+        }
+        installCommand = "yarn install";
+        break;
+      case "pnpm":
+        if (!fs.existsSync(path.join(process.env.APPDATA, "npm/pnpm.cmd"))) {
+          console.log(colorize("Installing pnpm globally...", "cyan"));
+          execSync("npm install -g pnpm", { stdio: "inherit" });
+        }
+        installCommand = "pnpm install";
+        break;
+      default:
+        throw new Error(`Invalid package manager: ${packageManager}`);
+    }
+    execSync(installCommand, { cwd: projectPath, stdio: "inherit" });
+    console.log(colorize("Dependency installation completed.", "green"));
+  } catch (error) {
+    console.error(error);
+    throw new Error(`Error installing dependencies: ${error.message}`);
   }
-  execSync(installCommand, { cwd: projectPath, stdio: "inherit" });
-  console.log(colorize("Dependency installation completed.", "green"));
 };
 
 const initializeGitRepositoryFromScratch = async (projectPath) => {
-  console.log(colorize(`Initializing Git repository...`, "cyan"));
-  const git = simpleGit(projectPath);
-  await git.init();
-  console.log(colorize(`Git repository initialized successfully!`, "green"));
+  try {
+    console.log(colorize(`Initializing Git repository...`, "cyan"));
+    const git = simpleGit(projectPath);
+    await git.init();
+    console.log(colorize(`Git repository initialized successfully!`, "green"));
+  } catch (error) {
+    console.error(error);
+    throw new Error(`Error initializing Git repository: ${error.message}`);
+  }
 };
 
 const createProject = async () => {

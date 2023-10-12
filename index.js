@@ -1,8 +1,5 @@
 #!/usr/bin/env node
 
-import colorize from "./colorize.js";
-import convertJsonToYaml from "./convertJsonToYaml.js";
-import convertYamlToJson from "./convertYamlToJson.js";
 import { execSync } from "child_process";
 import fs from "fs";
 import inquirer from "inquirer";
@@ -11,6 +8,62 @@ import simpleGit from "simple-git";
 
 const CURR_DIR = process.cwd();
 const PROJECT_NAME_PLACEHOLDER = "project_name";
+
+const colors = {
+  reset: "\x1b[0m",
+  red: "\x1b[31m",
+  green: "\x1b[32m",
+  yellow: "\x1b[33m",
+  cyan: "\x1b[36m",
+};
+
+const colorize = (text, color) => colors[color] + text + colors.reset;
+
+const convertJsonToYaml = (jsonData) => {
+  try {
+    const generateYamlRecursively = (data, indent = "") => {
+      let yamlData = "";
+      for (const key in data) {
+        if (typeof data[key] === "object") {
+          yamlData += `${indent}${key}:\n`;
+          yamlData += generateYamlRecursively(data[key], `${indent}  `);
+        } else {
+          yamlData += `${indent}${key}: ${data[key]}\n`;
+        }
+      }
+      return yamlData;
+    };
+
+    const yamlData = generateYamlRecursively(jsonData);
+    return yamlData;
+  } catch (error) {
+    console.error(error);
+    throw new Error(`Error converting JSON to YAML: ${error.message}`);
+  }
+};
+
+const convertYamlToJson = (yamlData) => {
+  try {
+    const lines = yamlData.split("\n");
+    const jsonData = {};
+
+    for (const line of lines) {
+      const trimmedLine = line.trim();
+
+      if (trimmedLine.startsWith("#") || trimmedLine === "") {
+        continue;
+      }
+
+      const [key, value] = trimmedLine.split(":").map((item) => item.trim());
+      jsonData[key] = value || {};
+    }
+
+    return JSON.stringify(jsonData, null, 2);
+  } catch (error) {
+    console.error(error);
+    throw new Error(`Error converting YAML to JSON: ${error.message}`);
+  }
+};
 
 const replaceProjectNamePlaceholder = (data, projectName) => {
   if (typeof data === "object") {

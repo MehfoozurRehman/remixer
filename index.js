@@ -183,7 +183,7 @@ const askQuestions = async () => {
   };
 };
 
-const confirmOverwrite = async (projectPath) => {
+const confirmOverwrite = async (projectPath, finalProjectName) => {
   const overwriteAnswer = await inquirer.prompt([
     {
       name: "overwrite",
@@ -234,14 +234,14 @@ const installDependencies = async (projectPath, packageManager) => {
       installCommand = "npm install --legacy-peer-deps";
       break;
     case "yarn":
-      if (!which.sync("yarn", { nothrow: true })) {
+      if (!fs.existsSync(path.join(process.env.APPDATA, "npm/yarn.cmd"))) {
         console.log(colorize("Installing yarn globally...", "cyan"));
         execSync("npm install -g yarn", { stdio: "inherit" });
       }
       installCommand = "yarn install";
       break;
     case "pnpm":
-      if (!which.sync("pnpm", { nothrow: true })) {
+      if (!fs.existsSync(path.join(process.env.APPDATA, "npm/pnpm.cmd"))) {
         console.log(colorize("Installing pnpm globally...", "cyan"));
         execSync("npm install -g pnpm", { stdio: "inherit" });
       }
@@ -303,6 +303,10 @@ const createProject = async () => {
     console.error(error);
     console.log(
       colorize("An error occurred while generating the project.", "red")
+    );
+    fs.rmdirSync(projectPath, { recursive: true });
+    console.log(
+      colorize(`Removed project directory '${projectName}'.`, "yellow")
     );
   }
 };

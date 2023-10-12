@@ -220,9 +220,17 @@ const createProject = async () => {
           installCommand = "npm install --legacy-peer-deps";
           break;
         case "yarn":
+          if (!which.sync("yarn", { nothrow: true })) {
+            console.log(colorize("Installing yarn globally...", "cyan"));
+            execSync("npm install -g yarn", { stdio: "inherit" });
+          }
           installCommand = "yarn install";
           break;
         case "pnpm":
+          if (!which.sync("pnpm", { nothrow: true })) {
+            console.log(colorize("Installing pnpm globally...", "cyan"));
+            execSync("npm install -g pnpm", { stdio: "inherit" });
+          }
           installCommand = "pnpm install";
           break;
         default:

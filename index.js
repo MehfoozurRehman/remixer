@@ -130,76 +130,132 @@ const generateDirectory = async (
   );
 };
 
+const askQuestions = async () => {
+  const answers = await inquirer.prompt(QUESTIONS);
+  const {
+    "project-choice": projectChoice,
+    "project-name": projectName,
+    "install-deps": installDeps,
+    "init-git": initGit,
+  } = answers;
+
+  let finalProjectName = projectName;
+  if (projectName === ".") {
+    const currentDirName = path.basename(CURR_DIR);
+    console.log(
+      colorize(
+        `Using current directory name '${currentDirName}' as the project name.`,
+        "yellow"
+      )
+    );
+    finalProjectName = currentDirName;
+  }
+
+  return {
+    projectChoice,
+    finalProjectName,
+    installDeps,
+    initGit,
+  };
+};
+
+const confirmOverwrite = async (projectPath) => {
+  const overwriteAnswer = await inquirer.prompt([
+    {
+      name: "overwrite",
+      type: "confirm",
+      message: `A directory named '${finalProjectName}' already exists. Do you want to overwrite it?`,
+      default: false,
+    },
+  ]);
+  if (!overwriteAnswer.overwrite) {
+    console.log(
+      colorize("Aborted. Please choose a different project name.", "red")
+    );
+    return false;
+  } else {
+    fs.rmdirSync(projectPath, { recursive: true });
+    console.log(
+      colorize(`Removed existing directory '${finalProjectName}'.`, "yellow")
+    );
+    return true;
+  }
+};
+
+const createProjectDirectory = async (projectPath) => {
+  await fs.promises.mkdir(projectPath, { recursive: true });
+  console.log(colorize(`Created project directory at ${projectPath}`, "green"));
+};
+
+const generateProjectFromTemplate = async (templatePath, finalProjectName) => {
+  console.log(
+    colorize(
+      `Creating project '${finalProjectName}' from template '${projectChoice}'...`,
+      "cyan"
+    )
+  );
+  await generateProjectFiles(templatePath, finalProjectName, finalProjectName);
+  console.log(
+    colorize(`Project '${finalProjectName}' generated successfully!`, "green")
+  );
+};
+
+const installDependencies = async (projectPath, packageManager) => {
+  console.log(
+    colorize(`Installing dependencies with ${packageManager}...`, "cyan")
+  );
+  let installCommand;
+  switch (packageManager) {
+    case "npm":
+      installCommand = "npm install --legacy-peer-deps";
+      break;
+    case "yarn":
+      if (!which.sync("yarn", { nothrow: true })) {
+        console.log(colorize("Installing yarn globally...", "cyan"));
+        execSync("npm install -g yarn", { stdio: "inherit" });
+      }
+      installCommand = "yarn install";
+      break;
+    case "pnpm":
+      if (!which.sync("pnpm", { nothrow: true })) {
+        console.log(colorize("Installing pnpm globally...", "cyan"));
+        execSync("npm install -g pnpm", { stdio: "inherit" });
+      }
+      installCommand = "pnpm install";
+      break;
+    default:
+      throw new Error(`Invalid package manager: ${packageManager}`);
+  }
+  execSync(installCommand, { cwd: projectPath, stdio: "inherit" });
+  console.log(colorize("Dependency installation completed.", "green"));
+};
+
+const initializeGitRepository = async (projectPath) => {
+  console.log(colorize(`Initializing Git repository...`, "cyan"));
+  execSync("git init", { cwd: projectPath, stdio: "inherit" });
+  console.log(colorize(`Git repository initialized successfully!`, "green"));
+};
+
 const createProject = async () => {
   try {
-    const answers = await inquirer.prompt(QUESTIONS);
-    const {
-      "project-choice": projectChoice,
-      "project-name": projectName,
-      "install-deps": installDeps,
-      "init-git": initGit,
-    } = answers;
-
-    let finalProjectName = projectName;
-    if (projectName === ".") {
-      const currentDirName = path.basename(CURR_DIR);
-      console.log(
-        colorize(
-          `Using current directory name '${currentDirName}' as the project name.`,
-          "yellow"
-        )
-      );
-      finalProjectName = currentDirName;
-    }
+    const { projectChoice, finalProjectName, installDeps, initGit } =
+      await askQuestions();
 
     const templatePath = path.join(__dirname, "templates", projectChoice);
     const projectPath = path.join(CURR_DIR, finalProjectName);
 
     if (fs.existsSync(projectPath)) {
-      const overwriteAnswer = await inquirer.prompt([
-        {
-          name: "overwrite",
-          type: "confirm",
-          message: `A directory named '${finalProjectName}' already exists. Do you want to overwrite it?`,
-          default: false,
-        },
-      ]);
-      if (!overwriteAnswer.overwrite) {
-        console.log(
-          colorize("Aborted. Please choose a different project name.", "red")
-        );
+      const shouldOverwrite = await confirmOverwrite(projectPath);
+      if (!shouldOverwrite) {
         return;
-      } else {
-        fs.rmdirSync(projectPath, { recursive: true });
-        console.log(
-          colorize(
-            `Removed existing directory '${finalProjectName}'.`,
-            "yellow"
-          )
-        );
       }
     }
 
-    await fs.promises.mkdir(projectPath, { recursive: true });
-    console.log(
-      colorize(`Created project directory at ${projectPath}`, "green")
-    );
+    await createProjectDirectory(projectPath);
 
-    console.log(
-      colorize(
-        `Creating project '${finalProjectName}' from template '${projectChoice}'...`,
-        "cyan"
-      )
-    );
-    await generateProjectFiles(
-      templatePath,
-      finalProjectName,
-      finalProjectName
-    );
+    await generateProjectFromTemplate(templatePath, finalProjectName);
 
-    console.log(
-      colorize(`Project '${finalProjectName}' generated successfully!`, "green")
-    );
+    console.log(colorize("Project generated successfully!", "green"));
 
     if (installDeps) {
       const packageManagerAnswer = await inquirer.prompt([
@@ -211,41 +267,11 @@ const createProject = async () => {
         },
       ]);
       const packageManager = packageManagerAnswer["package-manager"];
-      console.log(
-        colorize(`Installing dependencies with ${packageManager}...`, "cyan")
-      );
-      let installCommand;
-      switch (packageManager) {
-        case "npm":
-          installCommand = "npm install --legacy-peer-deps";
-          break;
-        case "yarn":
-          if (!which.sync("yarn", { nothrow: true })) {
-            console.log(colorize("Installing yarn globally...", "cyan"));
-            execSync("npm install -g yarn", { stdio: "inherit" });
-          }
-          installCommand = "yarn install";
-          break;
-        case "pnpm":
-          if (!which.sync("pnpm", { nothrow: true })) {
-            console.log(colorize("Installing pnpm globally...", "cyan"));
-            execSync("npm install -g pnpm", { stdio: "inherit" });
-          }
-          installCommand = "pnpm install";
-          break;
-        default:
-          throw new Error(`Invalid package manager: ${packageManager}`);
-      }
-      execSync(installCommand, { cwd: projectPath, stdio: "inherit" });
-      console.log(colorize("Dependency installation completed.", "green"));
+      await installDependencies(projectPath, packageManager);
     }
 
     if (initGit) {
-      console.log(colorize(`Initializing Git repository...`, "cyan"));
-      execSync("git init", { cwd: projectPath, stdio: "inherit" });
-      console.log(
-        colorize(`Git repository initialized successfully!`, "green")
-      );
+      await initializeGitRepository(projectPath);
     }
 
     console.log(colorize("All set! Happy coding!", "green"));

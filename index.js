@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import colorize from "./colorize";
 import { execSync } from "child_process";
 import { fileURLToPath } from "url";
 import fs from "fs";
@@ -9,15 +10,6 @@ import path from "path";
 const CURR_DIR = process.cwd();
 const PROJECT_NAME_PLACEHOLDER = "project_name";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-const colors = {
-  reset: "\x1b[0m",
-  red: "\x1b[31m",
-  green: "\x1b[32m",
-  yellow: "\x1b[33m",
-  cyan: "\x1b[36m",
-};
-const colorize = (text, color) => colors[color] + text + colors.reset;
 
 const replaceProjectNamePlaceholder = (data, projectName) => {
   if (typeof data === "object") {

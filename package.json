@@ -21,10 +21,10 @@
   },
   "homepage": "https://github.com//MehfoozurRehman/remixer#readme",
   "dependencies": {
-    "inquirer": "^9.2.11",
+    "inquirer": "^9.2.12",
     "simple-git": "^3.20.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.23.0"
+    "@babel/core": "^7.23.3"
   }
 }

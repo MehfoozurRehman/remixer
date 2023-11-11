@@ -45,8 +45,7 @@ const convertJsonToYaml = (jsonData) => {
     const yamlData = generateYamlRecursively(jsonData);
     return yamlData;
   } catch (error) {
-    console.error(error);
-    throw new Error(`Error converting JSON to YAML: ${error.message}`);
+    colorize(`Error converting JSON to YAML: ${error.message}`, "red");
   }
 };
 
@@ -68,8 +67,7 @@ const convertYamlToJson = (yamlData) => {
 
     return JSON.stringify(jsonData, null, 2);
   } catch (error) {
-    console.error(error);
-    throw new Error(`Error converting YAML to JSON: ${error.message}`);
+    colorize(`Error converting YAML to JSON: ${error.message}`, "red");
   }
 };
 
@@ -114,8 +112,7 @@ const generateProjectFiles = async (
       }
     }
   } catch (error) {
-    console.error(error);
-    throw new Error(`Error generating project: ${error.message}`);
+    colorize(`Error generating project files: ${error.message}`, "red");
   }
 };
 
@@ -260,8 +257,10 @@ const createProjectDirectory = async (projectPath) => {
     await promises.mkdir(projectPath, { recursive: true });
     colorize(`Created project directory at ${projectPath}`, "green");
   } catch (error) {
-    console.error(error);
-    throw new Error(`Error creating project directory: ${error.message}`);
+    colorize(
+      `Error creating project directory at ${projectPath}: ${error.message}`,
+      "red"
+    );
   }
 };
 
@@ -274,8 +273,10 @@ const generateProjectFromTemplate = async (templateUrl, finalProjectName) => {
     await simpleGit().clone(templateUrl, finalProjectName);
     colorize(`Project '${finalProjectName}' generated successfully!`, "green");
   } catch (error) {
-    console.error(error);
-    throw new Error(`Error generating project from template: ${error.message}`);
+    colorize(
+      `Error generating project '${finalProjectName}': ${error.message}`,
+      "red"
+    );
   }
 };
 
@@ -302,8 +303,10 @@ const installDependencies = async (projectPath, packageManager) => {
     });
     colorize("Dependency installation completed.", "green");
   } catch (error) {
-    console.error(error);
-    throw new Error(`Error installing dependencies: ${error.message}`);
+    colorize(
+      `Error installing dependencies with ${packageManager}: ${error.message}`,
+      "red"
+    );
   }
 };
 
@@ -313,8 +316,7 @@ const initializeGitRepositoryFromScratch = async (projectPath) => {
     await git.init();
     colorize(`Git repository initialized successfully!`, "green");
   } catch (error) {
-    console.error(error);
-    throw new Error(`Error initializing Git repository: ${error.message}`);
+    colorize(`Error initializing Git repository: ${error.message}`, "red");
   }
 };
 
@@ -357,8 +359,10 @@ const createProject = async () => {
 
     colorize("All set! Happy coding!", "green");
   } catch (error) {
-    console.error(error);
-    colorize("An error occurred while generating the project.", "red");
+    colorize(
+      "An error occurred while generating the project." + error.message,
+      "red"
+    );
     rmdirSync(projectPath, { recursive: true });
     colorize(`Removed project directory '${projectName}'.`, "yellow");
   }
@@ -368,7 +372,7 @@ const main = async () => {
   try {
     await createProject();
   } catch (error) {
-    console.error(error);
+    colorize(error.message, "red");
   }
 };
 

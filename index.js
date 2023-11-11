@@ -24,7 +24,8 @@ const colors = {
   cyan: "\x1b[36m",
 };
 
-const colorize = (text, color) => colors[color] + text + colors.reset;
+const colorize = (text, color) =>
+  console.log(colors[color] + text + colors.reset);
 
 const convertJsonToYaml = (jsonData) => {
   try {
@@ -245,15 +246,11 @@ const confirmOverwrite = async (projectPath, finalProjectName) => {
     },
   ]);
   if (!overwriteAnswer.overwrite) {
-    console.log(
-      colorize("Aborted. Please choose a different project name.", "red")
-    );
+    colorize("Aborted. Please choose a different project name.", "red");
     return false;
   } else {
     rmdirSync(projectPath, { recursive: true });
-    console.log(
-      colorize(`Removed existing directory '${finalProjectName}'.`, "yellow")
-    );
+    colorize(`Removed existing directory '${finalProjectName}'.`, "yellow");
     return true;
   }
 };
@@ -261,9 +258,7 @@ const confirmOverwrite = async (projectPath, finalProjectName) => {
 const createProjectDirectory = async (projectPath) => {
   try {
     await promises.mkdir(projectPath, { recursive: true });
-    console.log(
-      colorize(`Created project directory at ${projectPath}`, "green")
-    );
+    colorize(`Created project directory at ${projectPath}`, "green");
   } catch (error) {
     console.error(error);
     throw new Error(`Error creating project directory: ${error.message}`);
@@ -272,16 +267,12 @@ const createProjectDirectory = async (projectPath) => {
 
 const generateProjectFromTemplate = async (templateUrl, finalProjectName) => {
   try {
-    console.log(
-      colorize(
-        `Creating project '${finalProjectName}' from template '${templateUrl}'...`,
-        "cyan"
-      )
+    colorize(
+      `Creating project '${finalProjectName}' from template '${templateUrl}'...`,
+      "cyan"
     );
     await simpleGit().clone(templateUrl, finalProjectName);
-    console.log(
-      colorize(`Project '${finalProjectName}' generated successfully!`, "green")
-    );
+    colorize(`Project '${finalProjectName}' generated successfully!`, "green");
   } catch (error) {
     console.error(error);
     throw new Error(`Error generating project from template: ${error.message}`);
@@ -300,18 +291,16 @@ const installDependencies = async (projectPath, packageManager) => {
       packageManager !== "npm" &&
       !existsSync(path.join(process.env.APPDATA, `npm/${packageManager}.cmd`))
     ) {
-      console.log(colorize(`Installing ${packageManager} globally...`, "cyan"));
+      colorize(`Installing ${packageManager} globally...`, "cyan");
       execSync(`npm install -g ${packageManager}`, { stdio: "inherit" });
     }
 
-    console.log(
-      colorize(`Installing dependencies with ${packageManager}...`, "cyan")
-    );
+    colorize(`Installing dependencies with ${packageManager}...`, "cyan");
     execSync(installCommands[packageManager], {
       cwd: projectPath,
       stdio: "inherit",
     });
-    console.log(colorize("Dependency installation completed.", "green"));
+    colorize("Dependency installation completed.", "green");
   } catch (error) {
     console.error(error);
     throw new Error(`Error installing dependencies: ${error.message}`);
@@ -322,7 +311,7 @@ const initializeGitRepositoryFromScratch = async (projectPath) => {
   try {
     const git = simpleGit(projectPath);
     await git.init();
-    console.log(colorize(`Git repository initialized successfully!`, "green"));
+    colorize(`Git repository initialized successfully!`, "green");
   } catch (error) {
     console.error(error);
     throw new Error(`Error initializing Git repository: ${error.message}`);
@@ -347,7 +336,7 @@ const createProject = async () => {
 
     await generateProjectFromTemplate(templateUrl, projectName);
 
-    console.log(colorize("Project generated successfully!", "green"));
+    colorize("Project generated successfully!", "green");
 
     if (installDeps) {
       const packageManagerAnswer = await inquirer.prompt([
@@ -366,16 +355,12 @@ const createProject = async () => {
       await initializeGitRepositoryFromScratch(projectPath);
     }
 
-    console.log(colorize("All set! Happy coding!", "green"));
+    colorize("All set! Happy coding!", "green");
   } catch (error) {
     console.error(error);
-    console.log(
-      colorize("An error occurred while generating the project.", "red")
-    );
+    colorize("An error occurred while generating the project.", "red");
     rmdirSync(projectPath, { recursive: true });
-    console.log(
-      colorize(`Removed project directory '${projectName}'.`, "yellow")
-    );
+    colorize(`Removed project directory '${projectName}'.`, "yellow");
   }
 };
 

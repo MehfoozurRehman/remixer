@@ -296,24 +296,12 @@ const installDependencies = async (projectPath, packageManager) => {
       pnpm: "pnpm install",
     };
 
-    if (packageManager !== "npm") {
-      const globalPackageManager = {
-        yarn: "yarn",
-        pnpm: "pnpm",
-      }[packageManager];
-
-      if (
-        !existsSync(
-          path.join(process.env.APPDATA, `npm/${globalPackageManager}.cmd`)
-        )
-      ) {
-        console.log(
-          colorize(`Installing ${globalPackageManager} globally...`, "cyan")
-        );
-        execSync(`npm install -g ${globalPackageManager}`, {
-          stdio: "inherit",
-        });
-      }
+    if (
+      packageManager !== "npm" &&
+      !existsSync(path.join(process.env.APPDATA, `npm/${packageManager}.cmd`))
+    ) {
+      console.log(colorize(`Installing ${packageManager} globally...`, "cyan"));
+      execSync(`npm install -g ${packageManager}`, { stdio: "inherit" });
     }
 
     console.log(

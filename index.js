@@ -74,22 +74,14 @@ const convertYamlToJson = (yamlData) => {
 
 const replaceProjectNamePlaceholder = (data, projectName) => {
   if (typeof data === "object") {
-    if (Array.isArray(data)) {
-      return data.map((item) =>
-        replaceProjectNamePlaceholder(item, projectName)
-      );
-    } else {
-      const updatedData = {};
-      for (const key in data) {
-        if (Object.hasOwnProperty.call(data, key)) {
-          updatedData[key] = replaceProjectNamePlaceholder(
-            data[key],
-            projectName
-          );
-        }
-      }
-      return updatedData;
-    }
+    return Array.isArray(data)
+      ? data.map((item) => replaceProjectNamePlaceholder(item, projectName))
+      : Object.fromEntries(
+          Object.entries(data).map(([key, value]) => [
+            key,
+            replaceProjectNamePlaceholder(value, projectName),
+          ])
+        );
   } else if (typeof data === "string") {
     return data.replace(new RegExp(PROJECT_NAME_PLACEHOLDER, "g"), projectName);
   } else {

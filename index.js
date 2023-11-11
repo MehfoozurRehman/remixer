@@ -1,7 +1,14 @@
 #!/usr/bin/env node
 
+import {
+  createReadStream,
+  createWriteStream,
+  existsSync,
+  promises,
+  rmdirSync,
+} from "fs";
+
 import { execSync } from "child_process";
-import fs from "fs";
 import inquirer from "inquirer";
 import path from "path";
 import simpleGit from "simple-git";
@@ -96,11 +103,11 @@ const generateProjectFiles = async (
   projectName
 ) => {
   try {
-    const filesToCreate = await fs.promises.readdir(templatePath);
+    const filesToCreate = await promises.readdir(templatePath);
 
     for (const file of filesToCreate) {
       const origFilePath = path.join(templatePath, file);
-      const stats = await fs.promises.stat(origFilePath);
+      const stats = await promises.stat(origFilePath);
 
       if (stats.isFile()) {
         await generateFile(origFilePath, file, newProjectPath, projectName);
@@ -134,7 +141,7 @@ const generateFile = async (
     ) ||
     file.startsWith(".")
   ) {
-    let contents = await fs.promises.readFile(origFilePath, "utf8");
+    let contents = await promises.readFile(origFilePath, "utf8");
 
     if ([".yml", ".yaml"].includes(fileExt)) {
       const yamlData = JSON.parse(convertYamlToJson(contents));
@@ -150,19 +157,19 @@ const generateFile = async (
       );
     }
 
-    await fs.promises.writeFile(writePath, contents, "utf8");
+    await promises.writeFile(writePath, contents, "utf8");
   } else if (file === "package.json") {
-    let contents = await fs.promises.readFile(origFilePath, "utf8");
+    let contents = await promises.readFile(origFilePath, "utf8");
     const packageJson = JSON.parse(contents);
     packageJson.name = projectName;
-    await fs.promises.writeFile(
+    await promises.writeFile(
       writePath,
       JSON.stringify(packageJson, null, 2),
       "utf8"
     );
   } else {
-    const readStream = fs.createReadStream(origFilePath);
-    const writeStream = fs.createWriteStream(writePath);
+    const readStream = createReadStream(origFilePath);
+    const writeStream = createWriteStream(writePath);
     readStream.pipe(writeStream);
   }
 };
@@ -174,7 +181,7 @@ const generateDirectory = async (
   projectName
 ) => {
   const newDirPath = path.join(CURR_DIR, newProjectPath, file);
-  await fs.promises.mkdir(newDirPath, { recursive: true });
+  await promises.mkdir(newDirPath, { recursive: true });
   await generateProjectFiles(
     path.join(origFilePath),
     path.join(newProjectPath, file),
@@ -251,7 +258,7 @@ const confirmOverwrite = async (projectPath, finalProjectName) => {
     );
     return false;
   } else {
-    fs.rmdirSync(projectPath, { recursive: true });
+    rmdirSync(projectPath, { recursive: true });
     console.log(
       colorize(`Removed existing directory '${finalProjectName}'.`, "yellow")
     );
@@ -261,7 +268,7 @@ const confirmOverwrite = async (projectPath, finalProjectName) => {
 
 const createProjectDirectory = async (projectPath) => {
   try {
-    await fs.promises.mkdir(projectPath, { recursive: true });
+    await promises.mkdir(projectPath, { recursive: true });
     console.log(
       colorize(`Created project directory at ${projectPath}`, "green")
     );
@@ -291,32 +298,39 @@ const generateProjectFromTemplate = async (templateUrl, finalProjectName) => {
 
 const installDependencies = async (projectPath, packageManager) => {
   try {
+    const installCommands = {
+      npm: "npm install --legacy-peer-deps",
+      yarn: "yarn install",
+      pnpm: "pnpm install",
+    };
+
+    if (packageManager !== "npm") {
+      const globalPackageManager = {
+        yarn: "yarn",
+        pnpm: "pnpm",
+      }[packageManager];
+
+      if (
+        !existsSync(
+          path.join(process.env.APPDATA, `npm/${globalPackageManager}.cmd`)
+        )
+      ) {
+        console.log(
+          colorize(`Installing ${globalPackageManager} globally...`, "cyan")
+        );
+        execSync(`npm install -g ${globalPackageManager}`, {
+          stdio: "inherit",
+        });
+      }
+    }
+
     console.log(
       colorize(`Installing dependencies with ${packageManager}...`, "cyan")
     );
-    let installCommand;
-    switch (packageManager) {
-      case "npm":
-        installCommand = "npm install --legacy-peer-deps";
-        break;
-      case "yarn":
-        if (!fs.existsSync(path.join(process.env.APPDATA, "npm/yarn.cmd"))) {
-          console.log(colorize("Installing yarn globally...", "cyan"));
-          execSync("npm install -g yarn", { stdio: "inherit" });
-        }
-        installCommand = "yarn install";
-        break;
-      case "pnpm":
-        if (!fs.existsSync(path.join(process.env.APPDATA, "npm/pnpm.cmd"))) {
-          console.log(colorize("Installing pnpm globally...", "cyan"));
-          execSync("npm install -g pnpm", { stdio: "inherit" });
-        }
-        installCommand = "pnpm install";
-        break;
-      default:
-        throw new Error(`Invalid package manager: ${packageManager}`);
-    }
-    execSync(installCommand, { cwd: projectPath, stdio: "inherit" });
+    execSync(installCommands[packageManager], {
+      cwd: projectPath,
+      stdio: "inherit",
+    });
     console.log(colorize("Dependency installation completed.", "green"));
   } catch (error) {
     console.error(error);
@@ -326,7 +340,6 @@ const installDependencies = async (projectPath, packageManager) => {
 
 const initializeGitRepositoryFromScratch = async (projectPath) => {
   try {
-    console.log(colorize(`Initializing Git repository...`, "cyan"));
     const git = simpleGit(projectPath);
     await git.init();
     console.log(colorize(`Git repository initialized successfully!`, "green"));
@@ -343,7 +356,7 @@ const createProject = async () => {
 
     const projectPath = path.join(CURR_DIR, projectName);
 
-    if (fs.existsSync(projectPath)) {
+    if (existsSync(projectPath)) {
       const shouldOverwrite = await confirmOverwrite(projectPath);
       if (!shouldOverwrite) {
         return;
@@ -379,7 +392,7 @@ const createProject = async () => {
     console.log(
       colorize("An error occurred while generating the project.", "red")
     );
-    fs.rmdirSync(projectPath, { recursive: true });
+    rmdirSync(projectPath, { recursive: true });
     console.log(
       colorize(`Removed project directory '${projectName}'.`, "yellow")
     );

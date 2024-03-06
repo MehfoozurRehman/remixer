@@ -1,6 +1,6 @@
 {
   "name": "create-remixer",
-  "version": "4.5.0",
+  "version": "4.6.0",
   "description": "Project for instantiating projects via cli",
   "main": "index.js",
   "type": "module",
@@ -21,10 +21,10 @@
   },
   "homepage": "https://github.com//MehfoozurRehman/remixer#readme",
   "dependencies": {
-    "inquirer": "^9.2.12",
-    "simple-git": "^3.20.0"
+    "inquirer": "^9.2.15",
+    "simple-git": "^3.22.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.23.3"
+    "@babel/core": "^7.24.0"
   }
 }

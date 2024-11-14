@@ -1,6 +1,6 @@
 {
   "name": "create-remixer",
-  "version": "4.6.3",
+  "version": "4.6.4",
   "description": "Project for instantiating projects via cli",
   "main": "index.js",
   "type": "module",

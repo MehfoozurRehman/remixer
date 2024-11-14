@@ -19,7 +19,7 @@ importers:
         specifier: ^7.26.0
         version: 7.26.0
       terser:
-        specifier: ^5.10.0
+        specifier: ^5.36.0
         version: 5.36.0
 
 packages:

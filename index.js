@@ -1,12 +1,6 @@
 #!/usr/bin/env node
 
-import {
-  createReadStream,
-  createWriteStream,
-  existsSync,
-  promises,
-  rmdirSync,
-} from "fs";
+import { createReadStream, createWriteStream, promises as fs } from "fs";
 
 import { execSync } from "child_process";
 import inquirer from "inquirer";
@@ -42,8 +36,7 @@ const convertJsonToYaml = (jsonData) => {
       return yamlData;
     };
 
-    const yamlData = generateYamlRecursively(jsonData);
-    return yamlData;
+    return generateYamlRecursively(jsonData);
   } catch (error) {
     colorize(`Error converting JSON to YAML: ${error.message}`, "red");
   }
@@ -94,11 +87,11 @@ const generateProjectFiles = async (
   projectName
 ) => {
   try {
-    const filesToCreate = await promises.readdir(templatePath);
+    const filesToCreate = await fs.readdir(templatePath);
 
     for (const file of filesToCreate) {
       const origFilePath = path.join(templatePath, file);
-      const stats = await promises.stat(origFilePath);
+      const stats = await fs.stat(origFilePath);
 
       if (stats.isFile()) {
         await generateFile(origFilePath, file, newProjectPath, projectName);
@@ -131,7 +124,7 @@ const generateFile = async (
     ) ||
     file.startsWith(".")
   ) {
-    let contents = await promises.readFile(origFilePath, "utf8");
+    let contents = await fs.readFile(origFilePath, "utf8");
 
     if ([".yml", ".yaml"].includes(fileExt)) {
       const yamlData = JSON.parse(convertYamlToJson(contents));
@@ -147,16 +140,12 @@ const generateFile = async (
       );
     }
 
-    await promises.writeFile(writePath, contents, "utf8");
+    await fs.writeFile(writePath, contents, "utf8");
   } else if (file === "package.json") {
-    let contents = await promises.readFile(origFilePath, "utf8");
+    let contents = await fs.readFile(origFilePath, "utf8");
     const packageJson = JSON.parse(contents);
     packageJson.name = projectName;
-    await promises.writeFile(
-      writePath,
-      JSON.stringify(packageJson, null, 2),
-      "utf8"
-    );
+    await fs.writeFile(writePath, JSON.stringify(packageJson, null, 2), "utf8");
   } else {
     const readStream = createReadStream(origFilePath);
     const writeStream = createWriteStream(writePath);
@@ -171,7 +160,7 @@ const generateDirectory = async (
   projectName
 ) => {
   const newDirPath = path.join(CURR_DIR, newProjectPath, file);
-  await promises.mkdir(newDirPath, { recursive: true });
+  await fs.mkdir(newDirPath, { recursive: true });
   await generateProjectFiles(
     path.join(origFilePath),
     path.join(newProjectPath, file),
@@ -223,7 +212,7 @@ const confirmOverwrite = async (projectPath, finalProjectName) => {
     colorize("Aborted. Please choose a different project name.", "red");
     return false;
   } else {
-    rmdirSync(projectPath, { recursive: true });
+    await fs.rm(projectPath, { recursive: true, force: true });
     colorize(`Removed existing directory '${finalProjectName}'.`, "yellow");
     return true;
   }
@@ -231,7 +220,7 @@ const confirmOverwrite = async (projectPath, finalProjectName) => {
 
 const createProjectDirectory = async (projectPath) => {
   try {
-    await promises.mkdir(projectPath, { recursive: true });
+    await fs.mkdir(projectPath, { recursive: true });
     colorize(`Created project directory at ${projectPath}`, "green");
   } catch (error) {
     colorize(
@@ -303,8 +292,13 @@ const createProject = async () => {
 
     const projectPath = path.join(CURR_DIR, projectName);
 
-    if (existsSync(projectPath)) {
-      const shouldOverwrite = await confirmOverwrite(projectPath);
+    if (
+      await fs
+        .access(projectPath)
+        .then(() => true)
+        .catch(() => false)
+    ) {
+      const shouldOverwrite = await confirmOverwrite(projectPath, projectName);
       if (!shouldOverwrite) {
         return;
       }
@@ -340,7 +334,7 @@ const createProject = async () => {
       "An error occurred while generating the project." + error.message,
       "red"
     );
-    rmdirSync(projectPath, { recursive: true });
+    await fs.rm(projectPath, { recursive: true, force: true });
     colorize(`Removed project directory '${projectName}'.`, "yellow");
   }
 };

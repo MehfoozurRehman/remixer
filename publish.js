@@ -21,9 +21,8 @@ const publish = async () => {
     execSync(`git tag -a v${newVersion} -m "v${newVersion}"`);
     execSync("git push");
 
-    execSync("npm publish");
-
-    console.log("Published successfully");
+    console.log(`Ready to publish v${newVersion}!`);
+    console.log("Run `npm publish` to publish the new version.");
   } catch (error) {
     console.error(error);
   }

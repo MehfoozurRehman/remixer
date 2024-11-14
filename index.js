@@ -180,15 +180,6 @@ const generateDirectory = async (
 };
 
 const askQuestions = async () => {
-  const templates = [
-    { name: "api", url: "https://github.com/MehfoozurRehman/remixer-api.git" },
-    { name: "web", url: "https://github.com/MehfoozurRehman/remixer-web.git" },
-    {
-      name: "electron",
-      url: "https://github.com/MehfoozurRehman/remixer-electron.git",
-    },
-  ];
-  const templateChoices = templates.map((template) => template.name);
   const answers = await inquirer.prompt([
     {
       name: "project-name",
@@ -198,16 +189,6 @@ const askQuestions = async () => {
         /^([A-Za-z\-\\_\d.])+$/.test(input)
           ? true
           : "Project name may only include letters, numbers, underscores, hashes, and dots.",
-    },
-    {
-      name: "project-choice",
-      type: "list",
-      message: "What project template would you like to generate?",
-      choices: templateChoices,
-      validate: (input) =>
-        templateChoices.includes(input)
-          ? true
-          : "Please select a valid project template.",
     },
     {
       name: "install-deps",
@@ -222,12 +203,8 @@ const askQuestions = async () => {
       default: true,
     },
   ]);
-  const selectedTemplate = templates.find(
-    (template) => template.name === answers["project-choice"]
-  );
   return {
     projectName: answers["project-name"],
-    templateUrl: selectedTemplate.url,
     installDeps: answers["install-deps"],
     initGit: answers["init-git"],
   };
@@ -322,8 +299,7 @@ const initializeGitRepositoryFromScratch = async (projectPath) => {
 
 const createProject = async () => {
   try {
-    const { projectName, templateUrl, installDeps, initGit } =
-      await askQuestions();
+    const { projectName, installDeps, initGit } = await askQuestions();
 
     const projectPath = path.join(CURR_DIR, projectName);
 
@@ -336,6 +312,7 @@ const createProject = async () => {
 
     await createProjectDirectory(projectPath);
 
+    const templateUrl = "https://github.com/MehfoozurRehman/remixer-web.git";
     await generateProjectFromTemplate(templateUrl, projectName);
 
     colorize("Project generated successfully!", "green");

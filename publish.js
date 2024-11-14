@@ -1,5 +1,6 @@
 import { execSync } from "child_process";
 import fs from "fs/promises";
+import { minify } from "terser";
 
 const publish = async () => {
   try {
@@ -15,6 +16,10 @@ const publish = async () => {
       JSON.stringify(packageJsonData, null, 2),
       "utf8"
     );
+
+    const indexJs = await fs.readFile("index.js", "utf8");
+    const minifiedIndexJs = (await minify(indexJs)).code;
+    await fs.writeFile("index.min.js", minifiedIndexJs, "utf8");
 
     execSync("git add .");
     execSync(`git commit -m "chore: bump version to ${newVersion}"`);

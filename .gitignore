@@ -2,4 +2,6 @@ node_modules
 dist
 index.min.js
 .gitignore
-config.bat
+
+.env*
+!.env.example
